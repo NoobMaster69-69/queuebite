@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QueueBite — Kitchen</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F0EB;--card:#FFFFFF;--dark:#1C0F06;--muted:#8A7060;
+  --accent:#C85D14;--accent-light:#F5E8DC;--accent-dark:#9E4710;
+  --green:#1E6E3A;--green-light:#E4F2EA;
+  --red:#B52222;--red-light:#FCEAEA;
+  --amber:#B07A10;--amber-light:#FEF3DC;
+  --blue:#1A5CA8;--blue-light:#E0EEFF;
+  --purple:#5B3FA8;--purple-light:#EEE8FF;
+  --border:#E0D8D0;
+  --font-display:'Fraunces',serif;--font-ui:'Plus Jakarta Sans',sans-serif;
+}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--dark);min-height:100vh}
+h1,h2,h3{font-family:var(--font-display)}
+button{font-family:var(--font-ui);cursor:pointer;border:none;outline:none;background:none}
+input,select{font-family:var(--font-ui)}
+input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
+
+/* Topbar */
+.topbar{background:var(--dark);padding:14px 0;position:sticky;top:0;z-index:100}
+.topbar-inner{max-width:780px;margin:0 auto;padding:0 16px;display:flex;align-items:center;justify-content:space-between}
+.topbar-logo{font-family:var(--font-display);font-size:20px;font-weight:700;color:#fff}
+.topbar-logo em{font-style:italic;color:var(--accent-light)}
+.topbar-badge{background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-left:10px}
+
+/* Tabs */
+.tabs{background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:53px;z-index:90}
+.tabs-inner{max-width:780px;margin:0 auto;padding:0 16px;display:flex}
+.tab{padding:14px 20px;font-size:14px;font-weight:600;color:var(--muted);position:relative;display:flex;align-items:center;gap:6px}
+.tab.active{color:var(--accent)}
+.tab.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent)}
+.tab-count{display:inline-flex;align-items:center;justify-content:center;background:var(--red);color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%}
+
+/* Main wrap */
+.wrap{max-width:780px;margin:0 auto;padding:20px 16px 60px}
+.section-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+
+/* Order cards */
+.order-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;transition:box-shadow .15s}
+.order-card.pending{border-left:3px solid var(--amber)}
+.order-card.accepted{border-left:3px solid var(--green)}
+.order-card.preparing{border-left:3px solid var(--blue)}
+.order-card.ready{border-left:3px solid var(--purple)}
+.order-card.collected{border-left:3px solid #CCC;opacity:.7}
+.order-card.declined{border-left:3px solid var(--red);opacity:.6}
+
+.order-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
+.order-id{font-weight:700;font-size:16px}
+.order-meta{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.5}
+.status-badge{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;letter-spacing:.04em;flex-shrink:0;white-space:nowrap}
+.b-pending   {background:var(--amber-light);  color:var(--amber)}
+.b-accepted  {background:var(--green-light);  color:var(--green)}
+.b-preparing {background:var(--blue-light);   color:var(--blue)}
+.b-ready     {background:var(--purple-light); color:var(--purple)}
+.b-collected {background:#F0F0F0;             color:#666}
+.b-declined  {background:var(--red-light);    color:var(--red)}
+
+.order-items{font-size:14px;color:var(--muted);margin-bottom:14px;line-height:1.8}
+.order-items strong{color:var(--dark);font-weight:600}
+.order-total-line{font-size:13px;font-weight:600;margin-top:-6px;margin-bottom:14px}
+
+.order-type-pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;letter-spacing:.04em;margin-right:6px}
+.pill-dine{background:#EEF4FF;color:#3B5FC0}
+.pill-take{background:#FFF3E0;color:#B06000}
+
+.order-times{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.7}
+.order-times strong{color:var(--dark);font-weight:600}
+
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.abtn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;border:1.5px solid transparent;transition:all .12s}
+.abtn-accept   {background:var(--green-light);  color:var(--green);  border-color:#9ED4B6}
+.abtn-accept:hover  {background:#c8ebda}
+.abtn-decline  {background:var(--red-light);    color:var(--red);    border-color:#F0B0B0}
+.abtn-decline:hover {background:#fad5d5}
+.abtn-prepare  {background:var(--blue-light);   color:var(--blue);   border-color:#A0C4F4}
+.abtn-prepare:hover {background:#c6ddfa}
+.abtn-ready    {background:var(--purple-light); color:var(--purple); border-color:#C0AFF4}
+.abtn-ready:hover   {background:#ddd4ff}
+.abtn-collect  {background:var(--green-light);  color:var(--green);  border-color:#9ED4B6}
+.abtn-collect:hover {background:#c8ebda}
+
+/* Section dividers */
+.section-gap{margin-top:32px}
+
+/* Empty state */
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-state p{font-size:14px;line-height:1.7}
+
+/* Menu tab */
+.menu-item-row{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 16px;display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.mi-emoji{font-size:24px;width:36px;text-align:center;flex-shrink:0}
+.mi-info{flex:1}
+.mi-name{font-weight:600;font-size:14px}
+.mi-sub{font-size:13px;color:var(--muted);margin-top:1px}
+.avail-label{font-size:11px;font-weight:700;margin-right:8px}
+.avail-on{color:var(--green)}
+.avail-off{color:var(--muted)}
+
+.toggle{position:relative;display:inline-block;width:42px;height:24px;flex-shrink:0}
+.toggle input{display:none}
+.slider{position:absolute;inset:0;background:#D0C8C0;border-radius:12px;transition:.2s;cursor:pointer}
+.slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+.toggle input:checked+.slider{background:var(--green)}
+.toggle input:checked+.slider::before{transform:translateX(18px)}
+
+.del-btn{color:#C8A898;font-size:16px;padding:4px 8px;flex-shrink:0}
+.del-btn:hover{color:var(--red)}
+
+/* Add item form */
+.add-form{background:var(--card);border:1.5px dashed var(--border);border-radius:12px;padding:20px;margin-top:24px}
+.add-form-title{font-weight:600;font-size:14px;color:var(--muted);margin-bottom:16px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.finput{width:100%;padding:10px 12px;font-size:14px;border:1.5px solid var(--border);border-radius:8px;background:var(--bg)}
+.finput:focus{border-color:var(--accent);outline:none}
+.add-btn{background:var(--accent);color:#fff;padding:10px;border-radius:8px;font-size:14px;font-weight:600;width:100%}
+.add-btn:hover{background:var(--accent-dark)}
+.add-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* Stats bar */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center}
+.stat-num{font-family:var(--font-display);font-size:26px;font-weight:700}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:2px;font-weight:500}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState, useEffect} = React;
+const API = 'https://queuebite.pythonanywhere.com';
+
+const get    = (p)     => fetch(API+p).then(r=>r.json());
+const post   = (p, b)  => fetch(API+p,  {method:'POST',  headers:{'Content-Type':'application/json'}, body:JSON.stringify(b)}).then(r=>r.json());
+const patch  = (p, b)  => fetch(API+p,  {method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify(b)}).then(r=>r.json());
+const del    = (p)     => fetch(API+p,  {method:'DELETE'}).then(r=>r.json());
+
+function fmt(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('en-IN',{hour:'numeric',minute:'2-digit',hour12:true,day:'numeric',month:'short'});
+}
+
+const STATUS_BADGE = {
+  pending:   'b-pending',
+  accepted:  'b-accepted',
+  preparing: 'b-preparing',
+  ready:     'b-ready',
+  collected: 'b-collected',
+  declined:  'b-declined',
+};
+const STATUS_LABEL = {
+  pending:'Pending', accepted:'Accepted', preparing:'Preparing',
+  ready:'Ready to Collect', collected:'Collected', declined:'Declined',
+};
+
+// ─── App ──────────────────────────────────────────────
+function App() {
+  const [tab, setTab]       = useState('orders');
+  const [orders, setOrders] = useState([]);
+  const [menu, setMenu]     = useState([]);
+
+  const loadOrders = () => get('/orders').then(d=>setOrders(Array.isArray(d)?d:[])).catch(()=>{});
+  const loadMenu   = () => get('/menu').then(d=>setMenu(Array.isArray(d)?d:[])).catch(()=>{});
+
+  // Poll orders every 3 s
+  useEffect(() => {
+    loadOrders();
+    const t = setInterval(loadOrders, 10000);
+    return () => clearInterval(t);
+  }, []);
+
+  // Load menu on mount + when tab switches to menu
+  useEffect(() => { loadMenu(); }, [tab]);
+
+  const updateStatus = async (id, status) => {
+    const raw = id.replace('#','');
+    await patch(`/orders/${raw}`, {status});
+    loadOrders();
+  };
+
+  const toggleMenu = async (item) => {
+    await patch(`/menu/${item.id}`, {available: !item.available});
+    loadMenu();
+  };
+
+  const deleteMenuItem = async (item) => {
+    await del(`/menu/${item.id}`);
+    loadMenu();
+  };
+
+  const addMenuItem = async (item) => {
+    await post('/menu', item);
+    loadMenu();
+  };
+
+  const pendingCount   = orders.filter(o=>o.status==='pending').length;
+  const activeCount    = orders.filter(o=>['accepted','preparing','ready'].includes(o.status)).length;
+  const completedCount = orders.filter(o=>['collected','declined'].includes(o.status)).length;
+
+  return (
+    <div>
+      <div className="topbar">
+        <div className="topbar-inner">
+          <div>
+            <span className="topbar-logo">Queue<em>Bite</em> Kitchen</span>
+          </div>
+          {pendingCount>0 && <span className="topbar-badge">{pendingCount} new</span>}
+        </div>
+      </div>
+      <div className="tabs">
+        <div className="tabs-inner">
+          <button className={`tab${tab==='orders'?' active':''}`} onClick={()=>setTab('orders')}>
+            Orders
+            {pendingCount>0 && <span className="tab-count">{pendingCount}</span>}
+          </button>
+          <button className={`tab${tab==='menu'?' active':''}`} onClick={()=>setTab('menu')}>
+            Menu
+          </button>
+        </div>
+      </div>
+
+      {tab==='orders'
+        ? <OrdersTab orders={orders} onUpdateStatus={updateStatus} pendingCount={pendingCount} activeCount={activeCount} completedCount={completedCount} />
+        : <MenuTab menu={menu} onToggle={toggleMenu} onDelete={deleteMenuItem} onAdd={addMenuItem} />
+      }
+    </div>
+  );
+}
+
+// ─── Orders tab ───────────────────────────────────────
+function OrdersTab({orders, onUpdateStatus, pendingCount, activeCount, completedCount}) {
+  const pending   = orders.filter(o=>o.status==='pending');
+  const active    = orders.filter(o=>['accepted','preparing','ready'].includes(o.status));
+  const completed = orders.filter(o=>['collected','declined'].includes(o.status));
+
+  return (
+    <div className="wrap">
+      {/* Stats */}
+      <div className="stats-bar">
+        <div className="stat-card"><div className="stat-num" style={{color:'var(--amber)'}}>{pendingCount}</div><div className="stat-lbl">Pending</div></div>
+        <div className="stat-card"><div className="stat-num" style={{color:'var(--blue)'}}>{activeCount}</div><div className="stat-lbl">Active</div></div>
+        <div className="stat-card"><div className="stat-num" style={{color:'var(--green)'}}>{completedCount}</div><div className="stat-lbl">Completed</div></div>
+        <div className="stat-card"><div className="stat-num" style={{color:'var(--dark)'}}>{orders.length}</div><div className="stat-lbl">Total</div></div>
+      </div>
+
+      {orders.length===0 && (
+        <div className="empty-state">
+          <div className="empty-icon">🔔</div>
+          <p>No orders yet.<br/>Customer orders will appear here automatically.</p>
+        </div>
+      )}
+
+      {pending.length>0 && (
+        <>
+          <div className="section-label">Incoming ({pending.length})</div>
+          {pending.map(o=><OrderCard key={o.id} order={o} onUpdateStatus={onUpdateStatus}/>)}
+        </>
+      )}
+
+      {active.length>0 && (
+        <div className={pending.length>0?'section-gap':''}>
+          <div className="section-label">Active ({active.length})</div>
+          {active.map(o=><OrderCard key={o.id} order={o} onUpdateStatus={onUpdateStatus}/>)}
+        </div>
+      )}
+
+      {completed.length>0 && (
+        <div className={(pending.length||active.length)?'section-gap':''}>
+          <div className="section-label">Completed</div>
+          {completed.map(o=><OrderCard key={o.id} order={o} onUpdateStatus={onUpdateStatus}/>)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function OrderCard({order, onUpdateStatus}) {
+  const badge = STATUS_BADGE[order.status] || 'b-pending';
+  const label = STATUS_LABEL[order.status] || order.status;
+
+  return (
+    <div className={`order-card ${order.status}`}>
+      <div className="order-top">
+        <div>
+          <span className="order-id">{order.id}</span>
+          <div className="order-meta">
+            <strong style={{color:'var(--dark)'}}>{order.customerName}</strong>
+            {' · '}+91 {order.phone}
+          </div>
+          <div className="order-meta" style={{marginTop:2}}>
+            <span className={`order-type-pill ${order.orderType==='dine-in'?'pill-dine':'pill-take'}`}>
+              {order.orderType==='dine-in'?'Dine In':'Takeaway'}
+            </span>
+          </div>
+        </div>
+        <span className={`status-badge ${badge}`}>{label}</span>
+      </div>
+
+      <div className="order-items">
+        {order.items.map((it,i)=>(
+          <span key={i}><strong>{it.qty}×</strong> {it.name}{i<order.items.length-1?', ':''}</span>
+        ))}
+      </div>
+      <div className="order-total-line">Total: ₹{order.total}</div>
+
+      <div className="order-times">
+        <div>Placed: <strong>{fmt(order.placedTs)}</strong></div>
+        {order.collectedTs && <div>Collected: <strong>{fmt(order.collectedTs)}</strong></div>}
+      </div>
+
+      <div className="actions">
+        {order.status==='pending' && (
+          <>
+            <button className="abtn abtn-accept"  onClick={()=>onUpdateStatus(order.id,'accepted')}>✓ Accept</button>
+            <button className="abtn abtn-decline" onClick={()=>onUpdateStatus(order.id,'declined')}>✕ Decline</button>
+          </>
+        )}
+        {order.status==='accepted'  && <button className="abtn abtn-prepare" onClick={()=>onUpdateStatus(order.id,'preparing')}>🔥 Mark Preparing</button>}
+        {order.status==='preparing' && <button className="abtn abtn-ready"   onClick={()=>onUpdateStatus(order.id,'ready')}>🔔 Ready to Collect</button>}
+        {order.status==='ready'     && <button className="abtn abtn-collect" onClick={()=>onUpdateStatus(order.id,'collected')}>✓ Mark Collected</button>}
+      </div>
+    </div>
+  );
+}
+
+// ─── Menu tab ─────────────────────────────────────────
+function MenuTab({menu, onToggle, onDelete, onAdd}) {
+  const [form, setForm] = useState({name:'', price:'', category:'', emoji:'🍽️'});
+  const categories = [...new Set(menu.map(m=>m.category))];
+
+  const handleAdd = () => {
+    if (!form.name.trim()||!form.price||!form.category.trim()) return;
+    onAdd({name:form.name.trim(), price:Number(form.price), category:form.category.trim(), emoji:form.emoji||'🍽️'});
+    setForm({name:'', price:'', category:'', emoji:'🍽️'});
+  };
+
+  return (
+    <div className="wrap">
+      {categories.map(cat=>(
+        <div key={cat} style={{marginBottom:8}}>
+          <div className="section-label">{cat}</div>
+          {menu.filter(m=>m.category===cat).map(item=>(
+            <div key={item.id} className="menu-item-row">
+              <span className="mi-emoji">{item.emoji}</span>
+              <div className="mi-info">
+                <div className="mi-name">{item.name}</div>
+                <div className="mi-sub">₹{item.price}</div>
+              </div>
+              <span className={`avail-label ${item.available?'avail-on':'avail-off'}`}>
+                {item.available?'Available':'Off'}
+              </span>
+              <label className="toggle">
+                <input type="checkbox" checked={item.available} onChange={()=>onToggle(item)}/>
+                <span className="slider"></span>
+              </label>
+              <button className="del-btn" onClick={()=>{if(window.confirm(`Remove "${item.name}"?`)) onDelete(item);}}>✕</button>
+            </div>
+          ))}
+        </div>
+      ))}
+
+      <div className="add-form">
+        <div className="add-form-title">Add new item</div>
+        <div className="form-grid">
+          <input className="finput" placeholder="Item name" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/>
+          <input className="finput" placeholder="Price (₹)" type="number" value={form.price} onChange={e=>setForm({...form,price:e.target.value})}/>
+        </div>
+        <div className="form-grid">
+          <input className="finput" placeholder="Category" value={form.category} onChange={e=>setForm({...form,category:e.target.value})}/>
+          <input className="finput" placeholder="Emoji (e.g. 🍛)" value={form.emoji} onChange={e=>setForm({...form,emoji:e.target.value})}/>
+        </div>
+        <button className="add-btn" onClick={handleAdd} disabled={!form.name.trim()||!form.price||!form.category.trim()}>
+          Add to Menu
+        </button>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

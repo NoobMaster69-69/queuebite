@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QueueBite — Order</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#FBF4EC;--card:#FFFFFF;--dark:#1C0F06;--muted:#8A7060;
+  --accent:#C85D14;--accent-light:#F5E8DC;--accent-dark:#9E4710;
+  --green:#1E6E3A;--green-light:#E4F2EA;
+  --red:#B52222;--red-light:#FCEAEA;
+  --amber:#B07A10;--amber-light:#FEF3DC;
+  --blue:#1A5CA8;--blue-light:#E0EEFF;
+  --border:#E8DDD3;
+  --font-display:'Fraunces',serif;--font-ui:'Plus Jakarta Sans',sans-serif;
+}
+body{font-family:var(--font-ui);background:var(--bg);color:var(--dark);min-height:100vh}
+h1,h2,h3{font-family:var(--font-display)}
+button{font-family:var(--font-ui);cursor:pointer;border:none;outline:none;background:none}
+input,select{font-family:var(--font-ui)}
+input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
+
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:13px 0;position:sticky;top:0;z-index:100}
+.topbar-inner{max-width:680px;margin:0 auto;padding:0 16px;display:flex;align-items:center;justify-content:space-between}
+.topbar-logo{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--accent)}
+.topbar-logo em{font-style:italic;color:var(--dark)}
+.topbar-user{font-size:13px;color:var(--muted);font-weight:500}
+.back-btn{padding:6px 14px;border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted)}
+.back-btn:hover{background:var(--bg)}
+
+.wrap{max-width:680px;margin:0 auto;padding:0 16px}
+.page{padding:24px 0 100px}
+
+/* ── Centred screens ── */
+.center-screen{min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 16px;text-align:center}
+.screen-logo{font-family:var(--font-display);font-size:42px;font-weight:700;color:var(--accent);margin-bottom:6px}
+.screen-logo em{font-style:italic;color:var(--dark)}
+.screen-sub{color:var(--muted);font-size:15px;margin-bottom:36px}
+.screen-title{font-family:var(--font-display);font-size:28px;font-weight:700;margin-bottom:8px}
+.screen-hint{color:var(--muted);font-size:14px;margin-bottom:28px;line-height:1.6}
+
+.field{width:100%;max-width:360px;padding:13px 16px;font-size:16px;border:1.5px solid var(--border);border-radius:10px;background:var(--card);display:block;margin-bottom:12px}
+.field:focus{border-color:var(--accent);outline:none}
+.btn-primary{width:100%;max-width:360px;padding:14px;background:var(--accent);color:#fff;border-radius:10px;font-size:16px;font-weight:600}
+.btn-primary:hover{background:var(--accent-dark)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.error-msg{color:var(--red);font-size:13px;margin-top:10px;max-width:360px}
+
+/* ── Dashboard ── */
+.section-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.new-order-btn{background:var(--dark);color:#fff;padding:12px 28px;border-radius:10px;font-size:15px;font-weight:600;margin-bottom:28px}
+.new-order-btn:hover{background:#3a2010}
+
+/* Active order card */
+.active-card{background:var(--card);border:1.5px solid var(--border);border-radius:14px;padding:20px;margin-bottom:28px}
+.active-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+.order-id{font-weight:700;font-size:16px}
+.order-meta{font-size:13px;color:var(--muted);margin-top:3px}
+.order-type-pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.04em;flex-shrink:0}
+.pill-dine{background:#EEF4FF;color:#3B5FC0}
+.pill-take{background:#FFF3E0;color:#B06000}
+
+.status-track{margin-bottom:18px}
+.status-steps{display:flex;align-items:center;gap:0;margin-bottom:8px}
+.step-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:var(--bg);flex-shrink:0;transition:all .3s}
+.step-dot.done{background:var(--green);border-color:var(--green)}
+.step-dot.active{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light)}
+.step-line{flex:1;height:2px;background:var(--border);transition:background .3s}
+.step-line.done{background:var(--green)}
+.step-labels{display:flex;justify-content:space-between;padding:0 0}
+.step-label{font-size:10px;color:var(--muted);text-align:center;width:16px;white-space:nowrap;transform:translateX(-50%)}
+.step-label:first-child{transform:none}
+.step-label:last-child{transform:none;text-align:right}
+
+.status-message{font-size:15px;font-weight:600;padding:10px 14px;border-radius:8px;text-align:center}
+.order-items-preview{font-size:13px;color:var(--muted);margin-bottom:4px;line-height:1.7}
+.order-total-small{font-size:13px;font-weight:600}
+
+/* Declined card */
+.declined-card{background:var(--red-light);border:1.5px solid #F0B0B0;border-radius:14px;padding:20px;margin-bottom:28px}
+
+/* Past orders */
+.past-order{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.past-order-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.past-id{font-weight:700;font-size:14px}
+.past-status{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.s-collected{background:var(--green-light);color:var(--green)}
+.s-declined{background:var(--red-light);color:var(--red)}
+.past-items{font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.6}
+.past-times{display:flex;gap:16px;flex-wrap:wrap}
+.time-row{font-size:12px;color:var(--muted)}
+.time-row strong{color:var(--dark);font-weight:600}
+
+.empty-state{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+
+/* ── Menu ── */
+.category-title{font-family:var(--font-display);font-size:18px;font-weight:700;margin:28px 0 12px}
+.menu-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.menu-item.off{opacity:.45}
+.item-emoji{font-size:26px;width:38px;text-align:center;flex-shrink:0}
+.item-info{flex:1}
+.item-name{font-weight:600;font-size:15px}
+.item-price{font-size:14px;color:var(--accent);font-weight:600;margin-top:2px}
+.unavail-tag{font-size:11px;color:var(--muted);font-weight:500}
+.qty-ctrl{display:flex;align-items:center;gap:8px}
+.qbtn{width:30px;height:30px;border-radius:50%;font-size:18px;display:flex;align-items:center;justify-content:center;font-weight:500;flex-shrink:0}
+.qbtn.plus{background:var(--accent);color:#fff}
+.qbtn.plus:hover{background:var(--accent-dark)}
+.qbtn.minus{background:var(--accent-light);color:var(--accent)}
+.qbtn.minus:hover{background:#ecd5c2}
+.qnum{font-weight:600;font-size:15px;min-width:20px;text-align:center}
+.add-btn{background:var(--accent);color:#fff;padding:8px 18px;border-radius:8px;font-size:14px;font-weight:600}
+.add-btn:hover{background:var(--accent-dark)}
+
+.cart-bar{position:fixed;bottom:0;left:0;right:0;background:var(--dark);padding:14px 16px;z-index:200}
+.cart-bar-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.cart-bar-info .lbl{font-size:12px;color:rgba(255,255,255,.55)}
+.cart-bar-info .amt{font-size:18px;font-weight:600;color:#fff;margin-top:2px}
+.cart-bar-btn{background:var(--accent);color:#fff;padding:12px 24px;border-radius:10px;font-size:15px;font-weight:600;white-space:nowrap}
+.cart-bar-btn:hover{background:var(--accent-dark)}
+
+/* ── Cart ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px}
+.cart-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.cart-row:last-child{border-bottom:none}
+.cart-name{flex:1;font-weight:500;font-size:14px}
+.cart-sub{font-weight:600;font-size:14px;min-width:64px;text-align:right}
+.total-row{display:flex;justify-content:space-between;padding:14px 0;border-top:1.5px solid var(--dark);margin-top:10px;font-weight:700;font-size:18px}
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.type-btn{padding:14px;border:2px solid var(--border);border-radius:10px;font-size:14px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:5px;transition:all .12s;background:var(--card)}
+.type-btn em{font-size:22px;font-style:normal}
+.type-btn.active{border-color:var(--accent);background:var(--accent-light);color:var(--accent)}
+.place-btn{background:var(--dark);color:#fff;padding:15px;border-radius:12px;font-size:16px;font-weight:600;width:100%;margin-top:18px}
+.place-btn:hover{background:#3a2010}
+.place-btn:disabled{opacity:.4;cursor:not-allowed}
+.counter-note{font-size:13px;color:var(--muted);text-align:center;margin-top:14px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState, useEffect} = React;
+const API = 'https://queuebite.pythonanywhere.com';
+
+const get  = (path) => fetch(API+path).then(r=>r.json());
+const post = (path, body) => fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>({ok:r.ok,data:r.json()})).then(async r=>({...r,data:await r.data}));
+const patch = (path, body) => fetch(API+path,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+
+function fmt(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleString('en-IN',{hour:'numeric',minute:'2-digit',hour12:true,day:'numeric',month:'short',year:'numeric'});
+}
+
+const STATUS_STEPS = ['pending','accepted','preparing','ready','collected'];
+const STEP_LABELS  = ['Placed','Confirmed','Preparing','Ready','Collected'];
+const STATUS_MSG   = {
+  pending:   {text:'Waiting for kitchen to confirm…',   bg:'var(--amber-light)',  color:'var(--amber)'},
+  accepted:  {text:'Order confirmed! Kitchen is on it.', bg:'var(--green-light)',  color:'var(--green)'},
+  preparing: {text:'Being prepared right now!',          bg:'var(--blue-light)',   color:'var(--blue)'},
+  ready:     {text:'Ready to collect — head to the counter!', bg:'var(--green-light)', color:'var(--green)'},
+  collected: {text:'Collected. Enjoy your meal!',        bg:'#F1F1F1',            color:'#555'},
+};
+
+// ─── App ──────────────────────────────────────────────
+function App() {
+  const [screen, setScreen]     = useState('phone');
+  const [customer, setCustomer] = useState(null);
+  const [tempPhone, setTempPhone] = useState('');
+  const [orders, setOrders]     = useState([]);
+  const [menu, setMenu]         = useState([]);
+  const [cart, setCart]         = useState({});
+  const [orderType, setOrderType] = useState('dine-in');
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
+
+  // Poll orders every 3 s when logged in
+  useEffect(() => {
+    if (!customer) return;
+    const fetch_orders = () => {
+      get(`/orders?phone=${encodeURIComponent(customer.phone)}`)
+        .then(d => setOrders(Array.isArray(d) ? d : []))
+        .catch(()=>{});
+    };
+    fetch_orders();
+    const t = setInterval(fetch_orders, 10000);
+    return () => clearInterval(t);
+  }, [customer]);
+
+  // Fetch live menu when on menu screen
+  useEffect(() => {
+    if (screen === 'menu') {
+      get('/menu').then(d => setMenu(Array.isArray(d) ? d : []));
+      const t = setInterval(()=>get('/menu').then(d=>setMenu(Array.isArray(d)?d:[])),10000);
+      return () => clearInterval(t);
+    }
+  }, [screen]);
+
+  const handlePhoneSubmit = async (phone) => {
+    setLoading(true); setError('');
+    try {
+      const res = await get(`/customers/${encodeURIComponent(phone)}`);
+      if (res.error) { setTempPhone(phone); setScreen('register'); }
+      else           { setCustomer(res); setScreen('dashboard'); }
+    } catch(e) { setError('Cannot connect to server. Is server.py running?'); }
+    setLoading(false);
+  };
+
+  const handleRegister = async (name) => {
+    setLoading(true); setError('');
+    try {
+      const {data} = await post('/customers', {phone: tempPhone, name});
+      setCustomer(data); setScreen('dashboard');
+    } catch(e) { setError('Cannot connect to server.'); }
+    setLoading(false);
+  };
+
+  const handlePlaceOrder = async () => {
+    const items = Object.entries(cart).map(([id, qty]) => {
+      const item = menu.find(m => m.id === Number(id));
+      return {...item, qty};
+    });
+    const total = items.reduce((s,i) => s + i.price*i.qty, 0);
+    setLoading(true);
+    try {
+      await post('/orders', {phone: customer.phone, customerName: customer.name, items, total, orderType});
+      setCart({}); setScreen('dashboard');
+    } catch(e) { setError('Failed to place order.'); }
+    setLoading(false);
+  };
+
+  const updateCart = (id, delta) => {
+    setCart(prev => {
+      const n = {...prev, [id]: Math.max(0,(prev[id]||0)+delta)};
+      if (!n[id]) delete n[id];
+      return n;
+    });
+  };
+
+  const cartCount = Object.values(cart).reduce((a,b)=>a+b,0);
+  const cartTotal = Object.entries(cart).reduce((s,[id,qty])=>{
+    const it = menu.find(m=>m.id===Number(id));
+    return s + (it ? it.price*qty : 0);
+  },0);
+
+  const activeOrders = orders.filter(o => !['collected','declined'].includes(o.status));
+  const pastOrders   = orders.filter(o =>  ['collected','declined'].includes(o.status));
+
+  if (screen==='phone')     return <PhoneScreen     onSubmit={handlePhoneSubmit} loading={loading} error={error} />;
+  if (screen==='register')  return <RegisterScreen  phone={tempPhone} onSubmit={handleRegister} loading={loading} error={error} />;
+  if (screen==='dashboard') return <Dashboard       customer={customer} activeOrders={activeOrders} pastOrders={pastOrders} onNewOrder={()=>setScreen('menu')} />;
+  if (screen==='menu')      return <MenuScreen      menu={menu} cart={cart} updateCart={updateCart} cartCount={cartCount} cartTotal={cartTotal} onViewCart={()=>setScreen('cart')} onBack={()=>setScreen('dashboard')} />;
+  if (screen==='cart')      return <CartScreen      menu={menu} cart={cart} updateCart={updateCart} cartTotal={cartTotal} orderType={orderType} setOrderType={setOrderType} onPlace={handlePlaceOrder} onBack={()=>setScreen('menu')} loading={loading} error={error} />;
+}
+
+// ─── Phone screen ─────────────────────────────────────
+function PhoneScreen({onSubmit, loading, error}) {
+  const [phone, setPhone] = useState('');
+  const valid = /^[6-9]\d{9}$/.test(phone);
+  return (
+    <div className="center-screen">
+      <div className="screen-logo">Queue<em>Bite</em></div>
+      <p className="screen-sub">Quick food ordering</p>
+      <h2 className="screen-title">Enter your phone number</h2>
+      <p className="screen-hint">We'll use this to track your orders<br/>and remember you next time.</p>
+      <input
+        className="field"
+        type="tel"
+        maxLength={10}
+        placeholder="10-digit mobile number"
+        value={phone}
+        onChange={e=>setPhone(e.target.value.replace(/\D/g,''))}
+        onKeyDown={e=>e.key==='Enter'&&valid&&!loading&&onSubmit(phone)}
+        autoFocus
+      />
+      <button className="btn-primary" disabled={!valid||loading} onClick={()=>onSubmit(phone)}>
+        {loading ? 'Checking…' : 'Continue →'}
+      </button>
+      {error && <p className="error-msg">{error}</p>}
+    </div>
+  );
+}
+
+// ─── Register screen ──────────────────────────────────
+function RegisterScreen({phone, onSubmit, loading, error}) {
+  const [name, setName] = useState('');
+  return (
+    <div className="center-screen">
+      <div className="screen-logo">Queue<em>Bite</em></div>
+      <p className="screen-sub" style={{marginBottom:8}}>New here! 👋</p>
+      <p className="screen-hint" style={{marginBottom:8,color:'var(--muted)'}}>+91 {phone}</p>
+      <h2 className="screen-title">What's your name?</h2>
+      <p className="screen-hint">So the kitchen knows who to call.</p>
+      <input
+        className="field"
+        placeholder="Your name"
+        value={name}
+        onChange={e=>setName(e.target.value)}
+        onKeyDown={e=>e.key==='Enter'&&name.trim()&&!loading&&onSubmit(name.trim())}
+        autoFocus
+      />
+      <button className="btn-primary" disabled={!name.trim()||loading} onClick={()=>onSubmit(name.trim())}>
+        {loading ? 'Saving…' : 'Start Ordering →'}
+      </button>
+      {error && <p className="error-msg">{error}</p>}
+    </div>
+  );
+}
+
+// ─── Dashboard ────────────────────────────────────────
+function Dashboard({customer, activeOrders, pastOrders, onNewOrder}) {
+  return (
+    <div>
+      <div className="topbar">
+        <div className="topbar-inner">
+          <span className="topbar-logo">Queue<em>Bite</em></span>
+          <span className="topbar-user">Hey, {customer.name} 👋</span>
+        </div>
+      </div>
+      <div className="wrap page">
+        <button className="new-order-btn" onClick={onNewOrder}>+ Place New Order</button>
+
+        {activeOrders.length > 0 && (
+          <>
+            <div className="section-label">Live Order{activeOrders.length>1?'s':''}</div>
+            {activeOrders.map(o=><ActiveOrderCard key={o.id} order={o}/>)}
+          </>
+        )}
+
+        <div className="section-label" style={{marginTop: activeOrders.length?28:0}}>
+          Order History {pastOrders.length>0&&`(${pastOrders.length})`}
+        </div>
+        {pastOrders.length === 0
+          ? <div className="empty-state"><div className="empty-icon">🍽️</div><p>No past orders yet.<br/>Place your first order above!</p></div>
+          : pastOrders.map(o=><PastOrderCard key={o.id} order={o}/>)
+        }
+      </div>
+    </div>
+  );
+}
+
+function ActiveOrderCard({order}) {
+  if (order.status === 'declined') {
+    return (
+      <div className="declined-card" style={{marginBottom:14}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
+          <div>
+            <span style={{fontWeight:700,fontSize:15}}>{order.id}</span>
+            <div style={{fontSize:13,color:'var(--red)',marginTop:2}}>Order was declined</div>
+          </div>
+          <span style={{fontSize:11,fontWeight:700,background:'var(--red)',color:'#fff',padding:'4px 10px',borderRadius:20}}>Declined</span>
+        </div>
+        <div style={{fontSize:13,color:'var(--muted)'}}>
+          {order.items.map((i,idx)=><span key={idx}>{i.qty}× {i.name}{idx<order.items.length-1?', ':''}</span>)}
+        </div>
+        <div style={{fontSize:12,color:'var(--muted)',marginTop:8}}>Please speak to the counter for assistance.</div>
+      </div>
+    );
+  }
+
+  const stepIdx = STATUS_STEPS.indexOf(order.status);
+  const msg     = STATUS_MSG[order.status] || STATUS_MSG.pending;
+
+  return (
+    <div className="active-card" style={{marginBottom:14}}>
+      <div className="active-card-header">
+        <div>
+          <span className="order-id">{order.id}</span>
+          <div className="order-meta">
+            {order.orderType==='dine-in'?'Dine In':'Takeaway'} · ₹{order.total} · {fmt(order.placedTs)}
+          </div>
+        </div>
+        <span className={`order-type-pill ${order.orderType==='dine-in'?'pill-dine':'pill-take'}`}>
+          {order.orderType==='dine-in'?'Dine In':'Takeaway'}
+        </span>
+      </div>
+
+      {/* Step tracker */}
+      <div className="status-track">
+        <div className="status-steps">
+          {STATUS_STEPS.map((s,i)=>(
+            <React.Fragment key={s}>
+              <div className={`step-dot ${i<stepIdx?'done':''} ${i===stepIdx?'active':''}`}/>
+              {i<STATUS_STEPS.length-1 && <div className={`step-line ${i<stepIdx?'done':''}`}/>}
+            </React.Fragment>
+          ))}
+        </div>
+        <div className="status-steps" style={{marginTop:6}}>
+          {STEP_LABELS.map((l,i)=>(
+            <React.Fragment key={i}>
+              <span style={{fontSize:9,color:i===stepIdx?'var(--accent)':i<stepIdx?'var(--green)':'var(--muted)',fontWeight:i===stepIdx?600:400,width:16,textAlign:'center',flexShrink:0}}>{l}</span>
+              {i<STEP_LABELS.length-1&&<div style={{flex:1}}/>}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+
+      <div className="status-message" style={{background:msg.bg,color:msg.color,marginBottom:12}}>
+        {msg.text}
+      </div>
+
+      <div className="order-items-preview">
+        {order.items.map((it,i)=><span key={i}>{it.qty}× {it.name}{i<order.items.length-1?', ':''}</span>)}
+      </div>
+    </div>
+  );
+}
+
+function PastOrderCard({order}) {
+  return (
+    <div className="past-order">
+      <div className="past-order-header">
+        <div>
+          <span className="past-id">{order.id}</span>
+          <span style={{fontSize:12,color:'var(--muted)',marginLeft:8}}>
+            {order.orderType==='dine-in'?'Dine In':'Takeaway'}
+          </span>
+        </div>
+        <span className={`past-status ${order.status==='collected'?'s-collected':'s-declined'}`}>
+          {order.status==='collected'?'Collected':'Declined'}
+        </span>
+      </div>
+      <div className="past-items">
+        {order.items.map((it,i)=><span key={i}>{it.qty}× {it.name}{i<order.items.length-1?', ':''}</span>)}
+        {' · '}<strong style={{color:'var(--dark)'}}>₹{order.total}</strong>
+      </div>
+      <div className="past-times">
+        <div className="time-row">Placed: <strong>{fmt(order.placedTs)}</strong></div>
+        {order.collectedTs && <div className="time-row">Collected: <strong>{fmt(order.collectedTs)}</strong></div>}
+      </div>
+    </div>
+  );
+}
+
+// ─── Menu screen ──────────────────────────────────────
+function MenuScreen({menu, cart, updateCart, cartCount, cartTotal, onViewCart, onBack}) {
+  const byCategory = menu.reduce((acc, item) => {
+    acc[item.category] = acc[item.category] || [];
+    acc[item.category].push(item);
+    return acc;
+  }, {});
+
+  return (
+    <div>
+      <div className="topbar">
+        <div className="topbar-inner">
+          <span className="topbar-logo">Menu</span>
+          <button className="back-btn" onClick={onBack}>← Back</button>
+        </div>
+      </div>
+      <div className="wrap page">
+        {Object.entries(byCategory).map(([cat, items])=>(
+          <div key={cat}>
+            <h2 className="category-title">{cat}</h2>
+            {items.map(item=>(
+              <div key={item.id} className={`menu-item${!item.available?' off':''}`}>
+                <span className="item-emoji">{item.emoji}</span>
+                <div className="item-info">
+                  <div className="item-name">{item.name}</div>
+                  <div className="item-price">₹{item.price}</div>
+                  {!item.available && <div className="unavail-tag">Not available</div>}
+                </div>
+                {item.available && (
+                  cart[item.id]>0
+                    ? <div className="qty-ctrl">
+                        <button className="qbtn minus" onClick={()=>updateCart(item.id,-1)}>−</button>
+                        <span className="qnum">{cart[item.id]}</span>
+                        <button className="qbtn plus" onClick={()=>updateCart(item.id,1)}>+</button>
+                      </div>
+                    : <button className="add-btn" onClick={()=>updateCart(item.id,1)}>Add</button>
+                )}
+              </div>
+            ))}
+          </div>
+        ))}
+        {menu.length===0 && <div className="empty-state"><div className="empty-icon">⏳</div><p>Loading menu…</p></div>}
+      </div>
+      {cartCount>0 && (
+        <div className="cart-bar">
+          <div className="cart-bar-inner">
+            <div className="cart-bar-info">
+              <div className="lbl">{cartCount} item{cartCount!==1?'s':''}</div>
+              <div className="amt">₹{cartTotal}</div>
+            </div>
+            <button className="cart-bar-btn" onClick={onViewCart}>View Cart →</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Cart screen ──────────────────────────────────────
+function CartScreen({menu, cart, updateCart, cartTotal, orderType, setOrderType, onPlace, onBack, loading, error}) {
+  return (
+    <div>
+      <div className="topbar">
+        <div className="topbar-inner">
+          <span className="topbar-logo">Your Cart</span>
+          <button className="back-btn" onClick={onBack}>← Menu</button>
+        </div>
+      </div>
+      <div className="wrap page">
+        <div className="card">
+          <div className="section-label">Order Summary</div>
+          {Object.entries(cart).map(([id, qty])=>{
+            const item = menu.find(m=>m.id===Number(id));
+            if (!item) return null;
+            return (
+              <div className="cart-row" key={id}>
+                <span style={{fontSize:20}}>{item.emoji}</span>
+                <div className="qty-ctrl" style={{gap:6}}>
+                  <button className="qbtn minus" style={{width:26,height:26,fontSize:16}} onClick={()=>updateCart(item.id,-1)}>−</button>
+                  <span className="qnum" style={{fontSize:13}}>{qty}</span>
+                  <button className="qbtn plus"  style={{width:26,height:26,fontSize:16}} onClick={()=>updateCart(item.id,1)}>+</button>
+                </div>
+                <span className="cart-name">{item.name}</span>
+                <span className="cart-sub">₹{item.price*qty}</span>
+              </div>
+            );
+          })}
+          <div className="total-row"><span>Total</span><span>₹{cartTotal}</span></div>
+        </div>
+
+        <div className="card">
+          <div className="section-label">How will you have it?</div>
+          <div className="type-grid">
+            <button className={`type-btn${orderType==='dine-in'?' active':''}`} onClick={()=>setOrderType('dine-in')}>
+              <em>🍽️</em><span>Dine In</span><span style={{fontSize:11,opacity:.7}}>Eat here</span>
+            </button>
+            <button className={`type-btn${orderType==='takeaway'?' active':''}`} onClick={()=>setOrderType('takeaway')}>
+              <em>🛍️</em><span>Takeaway</span><span style={{fontSize:11,opacity:.7}}>Pack to go</span>
+            </button>
+          </div>
+        </div>
+
+        {error && <p style={{color:'var(--red)',fontSize:13,textAlign:'center'}}>{error}</p>}
+        <button className="place-btn" onClick={onPlace} disabled={loading}>
+          {loading ? 'Placing Order…' : `Place Order · ₹${cartTotal}`}
+        </button>
+        <p className="counter-note">Pay at the counter when your order is ready.</p>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
