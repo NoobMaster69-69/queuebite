@@ -28,14 +28,17 @@ button{font-family:var(--font-ui);cursor:pointer;border:none;outline:none;backgr
 input,select{font-family:var(--font-ui)}
 input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 
-/* Topbar */
 .topbar{background:var(--dark);padding:14px 0;position:sticky;top:0;z-index:100}
 .topbar-inner{max-width:780px;margin:0 auto;padding:0 16px;display:flex;align-items:center;justify-content:space-between}
 .topbar-logo{font-family:var(--font-display);font-size:20px;font-weight:700;color:#fff}
 .topbar-logo em{font-style:italic;color:var(--accent-light)}
-.topbar-badge{background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-left:10px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-badge{background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.topbar-badge.red{background:var(--red)}
+.sound-btn{background:rgba(255,255,255,.12);color:rgba(255,255,255,.65);padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.2)}
+.sound-btn:hover{background:rgba(255,255,255,.2);color:#fff}
+.sound-btn.on{background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.35)}
 
-/* Tabs */
 .tabs{background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:53px;z-index:90}
 .tabs-inner{max-width:780px;margin:0 auto;padding:0 16px;display:flex}
 .tab{padding:14px 20px;font-size:14px;font-weight:600;color:var(--muted);position:relative;display:flex;align-items:center;gap:6px}
@@ -43,58 +46,67 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .tab.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--accent)}
 .tab-count{display:inline-flex;align-items:center;justify-content:center;background:var(--red);color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%}
 
-/* Main wrap */
 .wrap{max-width:780px;margin:0 auto;padding:20px 16px 60px}
 .section-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.section-label.alert{color:var(--red)}
 
 /* Order cards */
-.order-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;transition:box-shadow .15s}
-.order-card.pending{border-left:3px solid var(--amber)}
-.order-card.accepted{border-left:3px solid var(--green)}
-.order-card.preparing{border-left:3px solid var(--blue)}
-.order-card.ready{border-left:3px solid var(--purple)}
-.order-card.collected{border-left:3px solid #CCC;opacity:.7}
-.order-card.declined{border-left:3px solid var(--red);opacity:.6}
+.order-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
+.order-card.pending        {border-left:3px solid var(--amber)}
+.order-card.accepted       {border-left:3px solid var(--green)}
+.order-card.preparing      {border-left:3px solid var(--blue)}
+.order-card.ready          {border-left:3px solid var(--purple)}
+.order-card.collected      {border-left:3px solid #CCC;opacity:.7}
+.order-card.declined       {border-left:3px solid var(--red);opacity:.6}
+.order-card.cancel-req     {border-left:3px solid var(--red);background:#FFFAF8}
+.order-card.cancelled      {border-left:3px solid #CCC;opacity:.65}
 
 .order-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px}
 .order-id{font-weight:700;font-size:16px}
 .order-meta{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.5}
 .status-badge{font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;letter-spacing:.04em;flex-shrink:0;white-space:nowrap}
-.b-pending   {background:var(--amber-light);  color:var(--amber)}
-.b-accepted  {background:var(--green-light);  color:var(--green)}
-.b-preparing {background:var(--blue-light);   color:var(--blue)}
-.b-ready     {background:var(--purple-light); color:var(--purple)}
-.b-collected {background:#F0F0F0;             color:#666}
-.b-declined  {background:var(--red-light);    color:var(--red)}
+.b-pending    {background:var(--amber-light);  color:var(--amber)}
+.b-accepted   {background:var(--green-light);  color:var(--green)}
+.b-preparing  {background:var(--blue-light);   color:var(--blue)}
+.b-ready      {background:var(--purple-light); color:var(--purple)}
+.b-collected  {background:#F0F0F0;             color:#666}
+.b-declined   {background:var(--red-light);    color:var(--red)}
+.b-cancel-req {background:#FFE8D8;             color:#C84000}
+.b-cancelled  {background:#EEEEEE;             color:#666}
 
 .order-items{font-size:14px;color:var(--muted);margin-bottom:14px;line-height:1.8}
 .order-items strong{color:var(--dark);font-weight:600}
 .order-total-line{font-size:13px;font-weight:600;margin-top:-6px;margin-bottom:14px}
-
 .order-type-pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:5px;letter-spacing:.04em;margin-right:6px}
 .pill-dine{background:#EEF4FF;color:#3B5FC0}
 .pill-take{background:#FFF3E0;color:#B06000}
-
 .order-times{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.7}
 .order-times strong{color:var(--dark);font-weight:600}
 
+/* Cancel alert banner inside card */
+.cancel-alert{background:var(--red-light);border:1px solid #F0B0B0;border-radius:8px;padding:9px 12px;font-size:13px;font-weight:600;color:var(--red);margin-bottom:12px}
+
 .actions{display:flex;gap:8px;flex-wrap:wrap}
 .abtn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;border:1.5px solid transparent;transition:all .12s}
-.abtn-accept   {background:var(--green-light);  color:var(--green);  border-color:#9ED4B6}
-.abtn-accept:hover  {background:#c8ebda}
-.abtn-decline  {background:var(--red-light);    color:var(--red);    border-color:#F0B0B0}
-.abtn-decline:hover {background:#fad5d5}
-.abtn-prepare  {background:var(--blue-light);   color:var(--blue);   border-color:#A0C4F4}
-.abtn-prepare:hover {background:#c6ddfa}
-.abtn-ready    {background:var(--purple-light); color:var(--purple); border-color:#C0AFF4}
-.abtn-ready:hover   {background:#ddd4ff}
-.abtn-collect  {background:var(--green-light);  color:var(--green);  border-color:#9ED4B6}
-.abtn-collect:hover {background:#c8ebda}
+.abtn-accept:hover   {background:#c8ebda}
+.abtn-decline:hover  {background:#fad5d5}
+.abtn-prepare:hover  {background:#c6ddfa}
+.abtn-ready:hover    {background:#ddd4ff}
+.abtn-collect:hover  {background:#c8ebda}
+.abtn-approve:hover  {background:#c8ebda}
+.abtn-deny:hover     {background:#c6ddfa}
+.abtn-cancel:hover   {background:var(--red-light);color:var(--red);border-color:#F0B0B0}
+.abtn-accept  {background:var(--green-light);  color:var(--green);  border-color:#9ED4B6}
+.abtn-decline {background:var(--red-light);    color:var(--red);    border-color:#F0B0B0}
+.abtn-prepare {background:var(--blue-light);   color:var(--blue);   border-color:#A0C4F4}
+.abtn-ready   {background:var(--purple-light); color:var(--purple); border-color:#C0AFF4}
+.abtn-collect {background:var(--green-light);  color:var(--green);  border-color:#9ED4B6}
+.abtn-approve {background:var(--green-light);  color:var(--green);  border-color:#9ED4B6}
+.abtn-deny    {background:var(--blue-light);   color:var(--blue);   border-color:#A0C4F4}
+.abtn-cancel  {background:none;color:var(--muted);border-color:var(--border)}
 
-/* Section dividers */
 .section-gap{margin-top:32px}
 
-/* Empty state */
 .empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
 .empty-icon{font-size:48px;margin-bottom:12px}
 .empty-state p{font-size:14px;line-height:1.7}
@@ -108,18 +120,14 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .avail-label{font-size:11px;font-weight:700;margin-right:8px}
 .avail-on{color:var(--green)}
 .avail-off{color:var(--muted)}
-
 .toggle{position:relative;display:inline-block;width:42px;height:24px;flex-shrink:0}
 .toggle input{display:none}
 .slider{position:absolute;inset:0;background:#D0C8C0;border-radius:12px;transition:.2s;cursor:pointer}
 .slider::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
 .toggle input:checked+.slider{background:var(--green)}
 .toggle input:checked+.slider::before{transform:translateX(18px)}
-
 .del-btn{color:#C8A898;font-size:16px;padding:4px 8px;flex-shrink:0}
 .del-btn:hover{color:var(--red)}
-
-/* Add item form */
 .add-form{background:var(--card);border:1.5px dashed var(--border);border-radius:12px;padding:20px;margin-top:24px}
 .add-form-title{font-weight:600;font-size:14px;color:var(--muted);margin-bottom:16px}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
@@ -139,91 +147,152 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const {useState, useEffect} = React;
+const {useState, useEffect, useRef} = React;
 const API = 'https://queuebite.pythonanywhere.com';
 
-const get    = (p)     => fetch(API+p).then(r=>r.json());
-const post   = (p, b)  => fetch(API+p,  {method:'POST',  headers:{'Content-Type':'application/json'}, body:JSON.stringify(b)}).then(r=>r.json());
-const patch  = (p, b)  => fetch(API+p,  {method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify(b)}).then(r=>r.json());
-const del    = (p)     => fetch(API+p,  {method:'DELETE'}).then(r=>r.json());
+const get   = (p)    => fetch(API+p).then(r=>r.json());
+const post  = (p, b) => fetch(API+p,{method:'POST',  headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(r=>r.json());
+const patch = (p, b) => fetch(API+p,{method:'PATCH', headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(r=>r.json());
+const del   = (p)    => fetch(API+p,{method:'DELETE'}).then(r=>r.json());
 
 function fmt(iso) {
   if (!iso) return '—';
   return new Date(iso).toLocaleString('en-IN',{hour:'numeric',minute:'2-digit',hour12:true,day:'numeric',month:'short'});
 }
 
+// ── Audio (browser Web Audio API) ────────────────────────────────────────────
+let audioCtx = null;
+function getCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+function playTone(freq, delay, dur) {
+  try {
+    const ctx = getCtx();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = 'sine'; o.frequency.value = freq;
+    const t = ctx.currentTime + delay;
+    g.gain.setValueAtTime(0.35, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.start(t); o.stop(t + dur + 0.05);
+  } catch(e) {}
+}
+// New order: two ascending beeps
+function playNewOrder()  { playTone(440, 0, 0.12); playTone(660, 0.20, 0.16); }
+// Cancel request: three descending tones — more urgent
+function playCancelReq() { playTone(550, 0, 0.15); playTone(380, 0.22, 0.15); playTone(220, 0.44, 0.25); }
+
+// ── Status maps ───────────────────────────────────────────────────────────────
 const STATUS_BADGE = {
-  pending:   'b-pending',
-  accepted:  'b-accepted',
-  preparing: 'b-preparing',
-  ready:     'b-ready',
-  collected: 'b-collected',
-  declined:  'b-declined',
+  pending:          'b-pending',
+  accepted:         'b-accepted',
+  preparing:        'b-preparing',
+  ready:            'b-ready',
+  collected:        'b-collected',
+  declined:         'b-declined',
+  cancel_requested: 'b-cancel-req',
+  cancelled:        'b-cancelled',
 };
 const STATUS_LABEL = {
-  pending:'Pending', accepted:'Accepted', preparing:'Preparing',
-  ready:'Ready to Collect', collected:'Collected', declined:'Declined',
+  pending:          'Pending',
+  accepted:         'Accepted',
+  preparing:        'Preparing',
+  ready:            'Ready to Collect',
+  collected:        'Collected',
+  declined:         'Declined',
+  cancel_requested: 'Cancel Requested',
+  cancelled:        'Cancelled',
 };
 
-// ─── App ──────────────────────────────────────────────
+// ── App ───────────────────────────────────────────────────────────────────────
 function App() {
-  const [tab, setTab]       = useState('orders');
-  const [orders, setOrders] = useState([]);
-  const [menu, setMenu]     = useState([]);
+  const [tab, setTab]               = useState('orders');
+  const [orders, setOrders]         = useState([]);
+  const [menu, setMenu]             = useState([]);
+  const [soundsEnabled, setSoundsEnabled] = useState(false);
+  const soundsRef    = useRef(false);
+  const prevOrdersRef = useRef(null);
 
-  const loadOrders = () => get('/orders').then(d=>setOrders(Array.isArray(d)?d:[])).catch(()=>{});
-  const loadMenu   = () => get('/menu').then(d=>setMenu(Array.isArray(d)?d:[])).catch(()=>{});
+  const loadOrders = () => {
+    get('/orders').then(data => {
+      const newOrders = Array.isArray(data) ? data : [];
 
-  // Poll orders every 3 s
+      // Sound detection — only after first load and if sounds enabled
+      if (soundsRef.current && prevOrdersRef.current !== null) {
+        const prevIds      = new Set(prevOrdersRef.current.map(o => o.id));
+        const prevStatuses = new Map(prevOrdersRef.current.map(o => [o.id, o.status]));
+
+        // New pending order arrived
+        if (newOrders.some(o => !prevIds.has(o.id) && o.status === 'pending')) {
+          playNewOrder();
+        }
+        // An order just became cancel_requested
+        if (newOrders.some(o => o.status === 'cancel_requested' && prevStatuses.get(o.id) !== 'cancel_requested')) {
+          playCancelReq();
+        }
+      }
+      prevOrdersRef.current = newOrders;
+      setOrders(newOrders);
+    }).catch(()=>{});
+  };
+
+  const loadMenu = () => get('/menu').then(d=>setMenu(Array.isArray(d)?d:[])).catch(()=>{});
+
+  // Poll orders every 10s
   useEffect(() => {
     loadOrders();
     const t = setInterval(loadOrders, 10000);
     return () => clearInterval(t);
   }, []);
 
-  // Load menu on mount + when tab switches to menu
   useEffect(() => { loadMenu(); }, [tab]);
 
-  const updateStatus = async (id, status) => {
-    const raw = id.replace('#','');
-    await patch(`/orders/${raw}`, {status});
+  const toggleSounds = () => {
+    const next = !soundsRef.current;
+    soundsRef.current = next;
+    setSoundsEnabled(next);
+    if (next) playNewOrder(); // confirmation beep so vendor knows it's on
+  };
+
+  // status: new status string
+  // extra:  optional extra fields (e.g. cancelledBy, cancelRequestedFrom)
+  const updateStatus = async (id, status, extra = {}) => {
+    const raw = id.replace('#', '');
+    await patch(`/orders/${raw}`, {status, ...extra});
     loadOrders();
   };
 
-  const toggleMenu = async (item) => {
-    await patch(`/menu/${item.id}`, {available: !item.available});
-    loadMenu();
-  };
+  const toggleMenu     = async (item) => { await patch(`/menu/${item.id}`, {available: !item.available}); loadMenu(); };
+  const deleteMenuItem = async (item) => { await del(`/menu/${item.id}`); loadMenu(); };
+  const addMenuItem    = async (item) => { await post('/menu', item); loadMenu(); };
 
-  const deleteMenuItem = async (item) => {
-    await del(`/menu/${item.id}`);
-    loadMenu();
-  };
-
-  const addMenuItem = async (item) => {
-    await post('/menu', item);
-    loadMenu();
-  };
-
-  const pendingCount   = orders.filter(o=>o.status==='pending').length;
-  const activeCount    = orders.filter(o=>['accepted','preparing','ready'].includes(o.status)).length;
-  const completedCount = orders.filter(o=>['collected','declined'].includes(o.status)).length;
+  const pendingCount   = orders.filter(o => o.status === 'pending').length;
+  const cancelReqCount = orders.filter(o => o.status === 'cancel_requested').length;
+  const alertCount     = pendingCount + cancelReqCount;
+  const activeCount    = orders.filter(o => ['accepted','preparing','ready'].includes(o.status)).length;
+  const completedCount = orders.filter(o => ['collected','declined','cancelled'].includes(o.status)).length;
 
   return (
     <div>
       <div className="topbar">
         <div className="topbar-inner">
-          <div>
-            <span className="topbar-logo">Queue<em>Bite</em> Kitchen</span>
+          <span className="topbar-logo">Queue<em>Bite</em> Kitchen</span>
+          <div className="topbar-right">
+            {cancelReqCount > 0 && <span className="topbar-badge red">⚠ {cancelReqCount} cancel req</span>}
+            {pendingCount   > 0 && <span className="topbar-badge">{pendingCount} new</span>}
+            <button className={`sound-btn${soundsEnabled?' on':''}`} onClick={toggleSounds}>
+              {soundsEnabled ? '🔔 On' : '🔕 Sounds'}
+            </button>
           </div>
-          {pendingCount>0 && <span className="topbar-badge">{pendingCount} new</span>}
         </div>
       </div>
       <div className="tabs">
         <div className="tabs-inner">
           <button className={`tab${tab==='orders'?' active':''}`} onClick={()=>setTab('orders')}>
             Orders
-            {pendingCount>0 && <span className="tab-count">{pendingCount}</span>}
+            {alertCount > 0 && <span className="tab-count">{alertCount}</span>}
           </button>
           <button className={`tab${tab==='menu'?' active':''}`} onClick={()=>setTab('menu')}>
             Menu
@@ -232,18 +301,19 @@ function App() {
       </div>
 
       {tab==='orders'
-        ? <OrdersTab orders={orders} onUpdateStatus={updateStatus} pendingCount={pendingCount} activeCount={activeCount} completedCount={completedCount} />
-        : <MenuTab menu={menu} onToggle={toggleMenu} onDelete={deleteMenuItem} onAdd={addMenuItem} />
+        ? <OrdersTab orders={orders} onUpdateStatus={updateStatus} pendingCount={pendingCount} activeCount={activeCount} completedCount={completedCount} cancelReqCount={cancelReqCount} />
+        : <MenuTab   menu={menu} onToggle={toggleMenu} onDelete={deleteMenuItem} onAdd={addMenuItem} />
       }
     </div>
   );
 }
 
-// ─── Orders tab ───────────────────────────────────────
-function OrdersTab({orders, onUpdateStatus, pendingCount, activeCount, completedCount}) {
-  const pending   = orders.filter(o=>o.status==='pending');
-  const active    = orders.filter(o=>['accepted','preparing','ready'].includes(o.status));
-  const completed = orders.filter(o=>['collected','declined'].includes(o.status));
+// ── Orders tab ────────────────────────────────────────────────────────────────
+function OrdersTab({orders, onUpdateStatus, pendingCount, activeCount, completedCount, cancelReqCount}) {
+  const needsAttention = orders.filter(o => o.status === 'cancel_requested');
+  const pending        = orders.filter(o => o.status === 'pending');
+  const active         = orders.filter(o => ['accepted','preparing','ready'].includes(o.status));
+  const completed      = orders.filter(o => ['collected','declined','cancelled'].includes(o.status));
 
   return (
     <div className="wrap">
@@ -255,43 +325,60 @@ function OrdersTab({orders, onUpdateStatus, pendingCount, activeCount, completed
         <div className="stat-card"><div className="stat-num" style={{color:'var(--dark)'}}>{orders.length}</div><div className="stat-lbl">Total</div></div>
       </div>
 
-      {orders.length===0 && (
+      {orders.length === 0 && (
         <div className="empty-state">
           <div className="empty-icon">🔔</div>
           <p>No orders yet.<br/>Customer orders will appear here automatically.</p>
         </div>
       )}
 
-      {pending.length>0 && (
+      {/* Needs attention — cancel requests */}
+      {needsAttention.length > 0 && (
         <>
-          <div className="section-label">Incoming ({pending.length})</div>
-          {pending.map(o=><OrderCard key={o.id} order={o} onUpdateStatus={onUpdateStatus}/>)}
+          <div className="section-label alert">⚠ Needs Attention ({needsAttention.length})</div>
+          {needsAttention.map(o => <OrderCard key={o.id} order={o} onUpdateStatus={onUpdateStatus} />)}
         </>
       )}
 
-      {active.length>0 && (
-        <div className={pending.length>0?'section-gap':''}>
-          <div className="section-label">Active ({active.length})</div>
-          {active.map(o=><OrderCard key={o.id} order={o} onUpdateStatus={onUpdateStatus}/>)}
+      {/* Incoming */}
+      {pending.length > 0 && (
+        <div className={needsAttention.length ? 'section-gap' : ''}>
+          <div className="section-label">Incoming ({pending.length})</div>
+          {pending.map(o => <OrderCard key={o.id} order={o} onUpdateStatus={onUpdateStatus} />)}
         </div>
       )}
 
-      {completed.length>0 && (
-        <div className={(pending.length||active.length)?'section-gap':''}>
+      {/* Active */}
+      {active.length > 0 && (
+        <div className={(needsAttention.length || pending.length) ? 'section-gap' : ''}>
+          <div className="section-label">Active ({active.length})</div>
+          {active.map(o => <OrderCard key={o.id} order={o} onUpdateStatus={onUpdateStatus} />)}
+        </div>
+      )}
+
+      {/* Completed */}
+      {completed.length > 0 && (
+        <div className={(needsAttention.length || pending.length || active.length) ? 'section-gap' : ''}>
           <div className="section-label">Completed</div>
-          {completed.map(o=><OrderCard key={o.id} order={o} onUpdateStatus={onUpdateStatus}/>)}
+          {completed.map(o => <OrderCard key={o.id} order={o} onUpdateStatus={onUpdateStatus} />)}
         </div>
       )}
     </div>
   );
 }
 
+// ── Order card ────────────────────────────────────────────────────────────────
 function OrderCard({order, onUpdateStatus}) {
   const badge = STATUS_BADGE[order.status] || 'b-pending';
   const label = STATUS_LABEL[order.status] || order.status;
 
+  // CSS class — underscores not valid in class names
+  const cardClass = order.status === 'cancel_requested' ? 'cancel-req' : order.status;
+  const isCancelReq    = order.status === 'cancel_requested';
+  const canVendorCancel = ['accepted','preparing','ready'].includes(order.status);
+
   return (
-    <div className={`order-card ${order.status}`}>
+    <div className={`order-card ${cardClass}`}>
       <div className="order-top">
         <div>
           <span className="order-id">{order.id}</span>
@@ -308,6 +395,13 @@ function OrderCard({order, onUpdateStatus}) {
         <span className={`status-badge ${badge}`}>{label}</span>
       </div>
 
+      {/* Cancel request alert */}
+      {isCancelReq && (
+        <div className="cancel-alert">
+          ⚠ Customer has requested cancellation
+        </div>
+      )}
+
       <div className="order-items">
         {order.items.map((it,i)=>(
           <span key={i}><strong>{it.qty}×</strong> {it.name}{i<order.items.length-1?', ':''}</span>
@@ -318,24 +412,46 @@ function OrderCard({order, onUpdateStatus}) {
       <div className="order-times">
         <div>Placed: <strong>{fmt(order.placedTs)}</strong></div>
         {order.collectedTs && <div>Collected: <strong>{fmt(order.collectedTs)}</strong></div>}
+        {order.cancelledTs && <div>Cancelled: <strong>{fmt(order.cancelledTs)}</strong></div>}
       </div>
 
       <div className="actions">
-        {order.status==='pending' && (
+        {/* Normal progression */}
+        {order.status === 'pending' && (
           <>
             <button className="abtn abtn-accept"  onClick={()=>onUpdateStatus(order.id,'accepted')}>✓ Accept</button>
             <button className="abtn abtn-decline" onClick={()=>onUpdateStatus(order.id,'declined')}>✕ Decline</button>
           </>
         )}
-        {order.status==='accepted'  && <button className="abtn abtn-prepare" onClick={()=>onUpdateStatus(order.id,'preparing')}>🔥 Mark Preparing</button>}
-        {order.status==='preparing' && <button className="abtn abtn-ready"   onClick={()=>onUpdateStatus(order.id,'ready')}>🔔 Ready to Collect</button>}
-        {order.status==='ready'     && <button className="abtn abtn-collect" onClick={()=>onUpdateStatus(order.id,'collected')}>✓ Mark Collected</button>}
+        {order.status === 'accepted'  && <button className="abtn abtn-prepare" onClick={()=>onUpdateStatus(order.id,'preparing')}>🔥 Mark Preparing</button>}
+        {order.status === 'preparing' && <button className="abtn abtn-ready"   onClick={()=>onUpdateStatus(order.id,'ready')}>🔔 Ready to Collect</button>}
+        {order.status === 'ready'     && <button className="abtn abtn-collect" onClick={()=>onUpdateStatus(order.id,'collected')}>✓ Mark Collected</button>}
+
+        {/* Cancel request — approve or deny */}
+        {isCancelReq && (
+          <>
+            <button className="abtn abtn-approve" onClick={()=>onUpdateStatus(order.id,'cancelled',{cancelledBy:'vendor_approved'})}>
+              ✓ Approve Cancel
+            </button>
+            <button className="abtn abtn-deny" onClick={()=>onUpdateStatus(order.id, order.cancelRequestedFrom || 'preparing', {cancelRequestedFrom: null})}>
+              ✕ Deny, Resume
+            </button>
+          </>
+        )}
+
+        {/* Vendor-initiated cancel for active orders */}
+        {canVendorCancel && (
+          <button className="abtn abtn-cancel" onClick={()=>{
+            if (window.confirm(`Cancel order ${order.id} for ${order.customerName}?`))
+              onUpdateStatus(order.id,'cancelled',{cancelledBy:'vendor'});
+          }}>✕ Cancel Order</button>
+        )}
       </div>
     </div>
   );
 }
 
-// ─── Menu tab ─────────────────────────────────────────
+// ── Menu tab ──────────────────────────────────────────────────────────────────
 function MenuTab({menu, onToggle, onDelete, onAdd}) {
   const [form, setForm] = useState({name:'', price:'', category:'', emoji:'🍽️'});
   const categories = [...new Set(menu.map(m=>m.category))];
@@ -374,11 +490,11 @@ function MenuTab({menu, onToggle, onDelete, onAdd}) {
       <div className="add-form">
         <div className="add-form-title">Add new item</div>
         <div className="form-grid">
-          <input className="finput" placeholder="Item name" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/>
-          <input className="finput" placeholder="Price (₹)" type="number" value={form.price} onChange={e=>setForm({...form,price:e.target.value})}/>
+          <input className="finput" placeholder="Item name"    value={form.name}     onChange={e=>setForm({...form,name:e.target.value})}/>
+          <input className="finput" placeholder="Price (₹)"   type="number" value={form.price}    onChange={e=>setForm({...form,price:e.target.value})}/>
         </div>
         <div className="form-grid">
-          <input className="finput" placeholder="Category" value={form.category} onChange={e=>setForm({...form,category:e.target.value})}/>
+          <input className="finput" placeholder="Category"     value={form.category} onChange={e=>setForm({...form,category:e.target.value})}/>
           <input className="finput" placeholder="Emoji (e.g. 🍛)" value={form.emoji} onChange={e=>setForm({...form,emoji:e.target.value})}/>
         </div>
         <button className="add-btn" onClick={handleAdd} disabled={!form.name.trim()||!form.price||!form.category.trim()}>
