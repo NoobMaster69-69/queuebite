@@ -28,9 +28,11 @@ input,select{font-family:var(--font-ui)}
 input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 
 .topbar{background:var(--card);border-bottom:1px solid var(--border);padding:13px 0;position:sticky;top:0;z-index:100}
-.topbar-inner{max-width:680px;margin:0 auto;padding:0 16px;display:flex;align-items:center;justify-content:space-between}
-.topbar-logo{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--accent)}
-.topbar-logo em{font-style:italic;color:var(--dark)}
+.topbar-inner{max-width:680px;margin:0 auto;padding:0 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.topbar-left{display:flex;align-items:center;gap:10px}
+.rest-logo{width:36px;height:36px;border-radius:8px;overflow:hidden;background:#EEE;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.rest-logo img{width:100%;height:100%;object-fit:cover}
+.topbar-name{font-family:var(--font-display);font-size:19px;font-weight:700;color:var(--dark)}
 .topbar-user{font-size:13px;color:var(--muted);font-weight:500}
 .back-btn{padding:6px 14px;border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted)}
 .back-btn:hover{background:var(--bg)}
@@ -38,13 +40,23 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .wrap{max-width:680px;margin:0 auto;padding:0 16px}
 .page{padding:24px 0 100px}
 
+/* Brand footer */
+.brand-footer{text-align:center;padding:20px;font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px}
+.es-badge{width:18px;height:18px;background:#00D4E0;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#000;flex-shrink:0}
+
+/* Full-screen states */
+.full-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center}
+.full-icon{font-size:56px;margin-bottom:20px}
+.full-title{font-family:var(--font-display);font-size:28px;font-weight:700;margin-bottom:10px}
+.full-sub{color:var(--muted);font-size:15px;line-height:1.6;max-width:360px}
+
+/* Center screens */
 .center-screen{min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 16px;text-align:center}
 .screen-logo{font-family:var(--font-display);font-size:42px;font-weight:700;color:var(--accent);margin-bottom:6px}
 .screen-logo em{font-style:italic;color:var(--dark)}
 .screen-sub{color:var(--muted);font-size:15px;margin-bottom:36px}
 .screen-title{font-family:var(--font-display);font-size:28px;font-weight:700;margin-bottom:8px}
 .screen-hint{color:var(--muted);font-size:14px;margin-bottom:28px;line-height:1.6}
-
 .field{width:100%;max-width:360px;padding:13px 16px;font-size:16px;border:1.5px solid var(--border);border-radius:10px;background:var(--card);display:block;margin-bottom:12px}
 .field:focus{border-color:var(--accent);outline:none}
 .btn-primary{width:100%;max-width:360px;padding:14px;background:var(--accent);color:#fff;border-radius:10px;font-size:16px;font-weight:600}
@@ -52,6 +64,7 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .btn-primary:disabled{opacity:.4;cursor:not-allowed}
 .error-msg{color:var(--red);font-size:13px;margin-top:10px;max-width:360px}
 
+/* Dashboard */
 .section-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
 .new-order-btn{background:var(--dark);color:#fff;padding:12px 28px;border-radius:10px;font-size:15px;font-weight:600;margin-bottom:28px}
 .new-order-btn:hover{background:#3a2010}
@@ -64,7 +77,6 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .order-type-pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.04em;flex-shrink:0}
 .pill-dine{background:#EEF4FF;color:#3B5FC0}
 .pill-take{background:#FFF3E0;color:#B06000}
-
 .status-track{margin-bottom:18px}
 .status-steps{display:flex;align-items:center;gap:0;margin-bottom:8px}
 .step-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);background:var(--bg);flex-shrink:0;transition:all .3s}
@@ -74,11 +86,7 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .step-line.done{background:var(--green)}
 .status-message{font-size:15px;font-weight:600;padding:10px 14px;border-radius:8px;text-align:center;margin-bottom:12px}
 .order-items-preview{font-size:13px;color:var(--muted);line-height:1.7}
-
-/* Declined card */
 .declined-card{background:var(--red-light);border:1.5px solid #F0B0B0;border-radius:14px;padding:20px;margin-bottom:14px}
-
-/* Cancellation UI */
 .cancel-link{color:var(--muted);font-size:12px;text-decoration:underline;margin-top:14px;padding:0;display:block;text-align:center}
 .cancel-link:hover{color:var(--red)}
 .confirm-box{background:var(--red-light);border:1px solid #F0B0B0;border-radius:10px;padding:14px;margin-top:14px}
@@ -102,7 +110,6 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .past-times{display:flex;gap:16px;flex-wrap:wrap}
 .time-row{font-size:12px;color:var(--muted)}
 .time-row strong{color:var(--dark);font-weight:600}
-
 .empty-state{text-align:center;padding:48px 20px;color:var(--muted)}
 .empty-icon{font-size:40px;margin-bottom:12px}
 
@@ -124,7 +131,6 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 .qnum{font-weight:600;font-size:15px;min-width:20px;text-align:center}
 .add-btn{background:var(--accent);color:#fff;padding:8px 18px;border-radius:8px;font-size:14px;font-weight:600}
 .add-btn:hover{background:var(--accent-dark)}
-
 .cart-bar{position:fixed;bottom:0;left:0;right:0;background:var(--dark);padding:14px 16px;z-index:200}
 .cart-bar-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
 .cart-bar-info .lbl{font-size:12px;color:rgba(255,255,255,.55)}
@@ -154,6 +160,7 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 <script type="text/babel">
 const {useState, useEffect} = React;
 const API = 'https://queuebite.pythonanywhere.com';
+const rid = new URLSearchParams(window.location.search).get('r');
 
 const get   = (path) => fetch(API+path).then(r=>r.json());
 const post  = (path, body) => fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>({ok:r.ok,data:r.json()})).then(async r=>({...r,data:await r.data}));
@@ -166,18 +173,28 @@ function fmt(iso) {
 
 const STATUS_STEPS = ['pending','accepted','preparing','ready','collected'];
 const STEP_LABELS  = ['Placed','Confirmed','Preparing','Ready','Collected'];
-const STATUS_MSG   = {
-  pending:          {text:'Waiting for kitchen to confirm…',           bg:'var(--amber-light)', color:'var(--amber)'},
-  accepted:         {text:'Order confirmed! Kitchen is on it.',        bg:'var(--green-light)', color:'var(--green)'},
-  preparing:        {text:'Being prepared right now!',                 bg:'var(--blue-light)',  color:'var(--blue)'},
-  ready:            {text:'Ready to collect — head to the counter!',   bg:'var(--green-light)', color:'var(--green)'},
-  collected:        {text:'Collected. Enjoy your meal!',               bg:'#F1F1F1',            color:'#555'},
-  cancel_requested: {text:'Cancellation requested — awaiting vendor.', bg:'var(--amber-light)', color:'var(--amber)'},
+const STATUS_MSG = {
+  pending:          {text:'Waiting for kitchen to confirm…',           bg:'var(--amber-light)',color:'var(--amber)'},
+  accepted:         {text:'Order confirmed! Kitchen is on it.',        bg:'var(--green-light)',color:'var(--green)'},
+  preparing:        {text:'Being prepared right now!',                 bg:'var(--blue-light)', color:'var(--blue)'},
+  ready:            {text:'Ready to collect — head to the counter!',   bg:'var(--green-light)',color:'var(--green)'},
+  collected:        {text:'Collected. Enjoy your meal!',               bg:'#F1F1F1',           color:'#555'},
+  cancel_requested: {text:'Cancellation requested — awaiting vendor.', bg:'var(--amber-light)',color:'var(--amber)'},
 };
+
+function BrandFooter() {
+  return (
+    <div className="brand-footer">
+      <div className="es-badge">Es</div>
+      QueueBite by EasyServe
+    </div>
+  );
+}
 
 // ─── App ──────────────────────────────────────────────
 function App() {
-  const [screen, setScreen]       = useState('phone');
+  const [screen, setScreen]       = useState('loading');
+  const [restInfo, setRestInfo]   = useState(null);
   const [customer, setCustomer]   = useState(null);
   const [tempPhone, setTempPhone] = useState('');
   const [orders, setOrders]       = useState([]);
@@ -187,11 +204,33 @@ function App() {
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState('');
 
-  // Poll orders every 10s when logged in
+  // Load restaurant info first
+  useEffect(() => {
+    if (!rid) { setScreen('no-id'); return; }
+    get(`/r/${rid}/info`).then(info => {
+      if (info.error) { setScreen('not-found'); return; }
+      setRestInfo(info);
+      if (!info.active)          { setScreen('inactive'); return; }
+      setScreen('phone');
+    }).catch(() => setScreen('error'));
+  }, []);
+
+  // Poll restaurant info for accepting status
+  useEffect(() => {
+    if (!customer) return;
+    const t = setInterval(() => {
+      get(`/r/${rid}/info`).then(info => {
+        if (!info.error) setRestInfo(info);
+      });
+    }, 10000);
+    return () => clearInterval(t);
+  }, [customer]);
+
+  // Poll orders when logged in
   useEffect(() => {
     if (!customer) return;
     const fetchOrders = () => {
-      get(`/orders?phone=${encodeURIComponent(customer.phone)}`)
+      get(`/r/${rid}/orders?phone=${encodeURIComponent(customer.phone)}`)
         .then(d => setOrders(Array.isArray(d) ? d : []))
         .catch(()=>{});
     };
@@ -203,8 +242,8 @@ function App() {
   // Fetch live menu when on menu screen
   useEffect(() => {
     if (screen === 'menu') {
-      get('/menu').then(d => setMenu(Array.isArray(d) ? d : []));
-      const t = setInterval(()=>get('/menu').then(d=>setMenu(Array.isArray(d)?d:[])),10000);
+      get(`/r/${rid}/menu`).then(d => setMenu(Array.isArray(d)?d:[]));
+      const t = setInterval(()=>get(`/r/${rid}/menu`).then(d=>setMenu(Array.isArray(d)?d:[])),10000);
       return () => clearInterval(t);
     }
   }, [screen]);
@@ -215,7 +254,7 @@ function App() {
       const res = await get(`/customers/${encodeURIComponent(phone)}`);
       if (res.error) { setTempPhone(phone); setScreen('register'); }
       else           { setCustomer(res); setScreen('dashboard'); }
-    } catch(e) { setError('Cannot connect to server. Is server.py running?'); }
+    } catch(e) { setError('Cannot connect to server.'); }
     setLoading(false);
   };
 
@@ -229,6 +268,9 @@ function App() {
   };
 
   const handlePlaceOrder = async () => {
+    // Re-check accepting orders before placing
+    const info = await get(`/r/${rid}/info`);
+    if (!info.acceptingOrders) { setError('Sorry, the kitchen is not taking orders right now.'); return; }
     const items = Object.entries(cart).map(([id, qty]) => {
       const item = menu.find(m => m.id === Number(id));
       return {...item, qty};
@@ -236,24 +278,18 @@ function App() {
     const total = items.reduce((s,i) => s + i.price*i.qty, 0);
     setLoading(true);
     try {
-      await post('/orders', {phone: customer.phone, customerName: customer.name, items, total, orderType});
+      await post(`/r/${rid}/orders`, {phone: customer.phone, customerName: customer.name, items, total, orderType});
       setCart({}); setScreen('dashboard');
     } catch(e) { setError('Failed to place order.'); }
     setLoading(false);
   };
 
-  // Cancel directly (pending / accepted)
   const handleCancelOrder = async (orderId) => {
-    await patch(`/orders/${orderId.replace('#','')}`, {status: 'cancelled', cancelledBy: 'customer'});
+    await patch(`/r/${rid}/orders/${orderId.replace('#','')}`, {status:'cancelled', cancelledBy:'customer', phone:customer.phone});
   };
 
-  // Request cancellation (preparing / ready) — vendor must approve
   const handleRequestCancel = async (orderId, currentStatus) => {
-    await patch(`/orders/${orderId.replace('#','')}`, {
-      status: 'cancel_requested',
-      cancelRequestedFrom: currentStatus,
-      cancelledBy: 'customer',
-    });
+    await patch(`/r/${rid}/orders/${orderId.replace('#','')}`, {status:'cancel_requested', cancelRequestedFrom:currentStatus, cancelledBy:'customer', phone:customer.phone});
   };
 
   const updateCart = (id, delta) => {
@@ -270,82 +306,147 @@ function App() {
     return s + (it ? it.price*qty : 0);
   },0);
 
-  // cancelled goes to history, not active
   const activeOrders = orders.filter(o => !['collected','declined','cancelled'].includes(o.status));
   const pastOrders   = orders.filter(o =>  ['collected','declined','cancelled'].includes(o.status));
 
-  if (screen==='phone')     return <PhoneScreen    onSubmit={handlePhoneSubmit} loading={loading} error={error} />;
-  if (screen==='register')  return <RegisterScreen phone={tempPhone} onSubmit={handleRegister} loading={loading} error={error} />;
-  if (screen==='dashboard') return <Dashboard      customer={customer} activeOrders={activeOrders} pastOrders={pastOrders} onNewOrder={()=>setScreen('menu')} onCancelOrder={handleCancelOrder} onRequestCancel={handleRequestCancel} />;
-  if (screen==='menu')      return <MenuScreen     menu={menu} cart={cart} updateCart={updateCart} cartCount={cartCount} cartTotal={cartTotal} onViewCart={()=>setScreen('cart')} onBack={()=>setScreen('dashboard')} />;
-  if (screen==='cart')      return <CartScreen     menu={menu} cart={cart} updateCart={updateCart} cartTotal={cartTotal} orderType={orderType} setOrderType={setOrderType} onPlace={handlePlaceOrder} onBack={()=>setScreen('menu')} loading={loading} error={error} />;
+  // Full-screen states
+  if (screen === 'loading')   return <LoadingScreen/>;
+  if (screen === 'no-id')     return <FullScreen icon="🔗" title="No restaurant found" sub="This link doesn't include a restaurant ID. Please scan the QR code provided by the restaurant."/>;
+  if (screen === 'not-found') return <FullScreen icon="🚫" title="Restaurant not found" sub="This restaurant doesn't exist on QueueBite."/>;
+  if (screen === 'inactive')  return <FullScreen icon="🔒" title="This restaurant is closed" sub={`${restInfo?.name || 'This restaurant'} is no longer active on QueueBite.`} showBrand/>;
+  if (screen === 'error')     return <FullScreen icon="⚠️" title="Connection error" sub="Could not reach the server. Please try again."/>;
+
+  // Paused — but only show this on dashboard/menu, not during active ordering
+  const isPaused = restInfo && !restInfo.acceptingOrders;
+
+  if (screen === 'phone')    return <PhoneScreen    restInfo={restInfo} onSubmit={handlePhoneSubmit} loading={loading} error={error}/>;
+  if (screen === 'register') return <RegisterScreen phone={tempPhone} onSubmit={handleRegister} loading={loading} error={error}/>;
+
+  // Dashboard — show paused screen if not accepting and no active orders
+  if (screen === 'dashboard' && isPaused && activeOrders.length === 0) {
+    return <PausedScreen restInfo={restInfo} customer={customer} pastOrders={pastOrders}/>;
+  }
+
+  if (screen === 'dashboard') return <Dashboard customer={customer} restInfo={restInfo} activeOrders={activeOrders} pastOrders={pastOrders} onNewOrder={()=>{ if(isPaused){alert('The kitchen is not taking orders right now.');return;} setScreen('menu');}} onCancelOrder={handleCancelOrder} onRequestCancel={handleRequestCancel}/>;
+  if (screen === 'menu')      return <MenuScreen  restInfo={restInfo} menu={menu} cart={cart} updateCart={updateCart} cartCount={cartCount} cartTotal={cartTotal} onViewCart={()=>setScreen('cart')} onBack={()=>setScreen('dashboard')}/>;
+  if (screen === 'cart')      return <CartScreen  restInfo={restInfo} menu={menu} cart={cart} updateCart={updateCart} cartTotal={cartTotal} orderType={orderType} setOrderType={setOrderType} onPlace={handlePlaceOrder} onBack={()=>setScreen('menu')} loading={loading} error={error}/>;
 }
 
-// ─── Phone screen ─────────────────────────────────────
-function PhoneScreen({onSubmit, loading, error}) {
-  const [phone, setPhone] = useState('');
-  const valid = /^[6-9]\d{9}$/.test(phone);
+// ── Full screen states ────────────────────────────────
+function LoadingScreen() {
+  return <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'100vh',color:'var(--muted)'}}>Loading…</div>;
+}
+
+function FullScreen({icon, title, sub, showBrand}) {
   return (
-    <div className="center-screen">
-      <div className="screen-logo">Queue<em>Bite</em></div>
-      <p className="screen-sub">Quick food ordering</p>
-      <h2 className="screen-title">Enter your phone number</h2>
-      <p className="screen-hint">We'll use this to track your orders<br/>and remember you next time.</p>
-      <input className="field" type="tel" maxLength={10} placeholder="10-digit mobile number"
-        value={phone} onChange={e=>setPhone(e.target.value.replace(/\D/g,''))}
-        onKeyDown={e=>e.key==='Enter'&&valid&&!loading&&onSubmit(phone)} autoFocus />
-      <button className="btn-primary" disabled={!valid||loading} onClick={()=>onSubmit(phone)}>
-        {loading ? 'Checking…' : 'Continue →'}
-      </button>
-      {error && <p className="error-msg">{error}</p>}
+    <div className="full-screen">
+      <div className="full-icon">{icon}</div>
+      <h1 className="full-title">{title}</h1>
+      <p className="full-sub">{sub}</p>
+      {showBrand && <div style={{marginTop:32}}><BrandFooter/></div>}
     </div>
   );
 }
 
-// ─── Register screen ──────────────────────────────────
-function RegisterScreen({phone, onSubmit, loading, error}) {
-  const [name, setName] = useState('');
-  return (
-    <div className="center-screen">
-      <div className="screen-logo">Queue<em>Bite</em></div>
-      <p className="screen-sub" style={{marginBottom:8}}>New here! 👋</p>
-      <p className="screen-hint" style={{marginBottom:8,color:'var(--muted)'}}>+91 {phone}</p>
-      <h2 className="screen-title">What's your name?</h2>
-      <p className="screen-hint">So the kitchen knows who to call.</p>
-      <input className="field" placeholder="Your name" value={name}
-        onChange={e=>setName(e.target.value)}
-        onKeyDown={e=>e.key==='Enter'&&name.trim()&&!loading&&onSubmit(name.trim())} autoFocus />
-      <button className="btn-primary" disabled={!name.trim()||loading} onClick={()=>onSubmit(name.trim())}>
-        {loading ? 'Saving…' : 'Start Ordering →'}
-      </button>
-      {error && <p className="error-msg">{error}</p>}
-    </div>
-  );
-}
-
-// ─── Dashboard ────────────────────────────────────────
-function Dashboard({customer, activeOrders, pastOrders, onNewOrder, onCancelOrder, onRequestCancel}) {
+function PausedScreen({restInfo, customer, pastOrders}) {
   return (
     <div>
       <div className="topbar">
         <div className="topbar-inner">
-          <span className="topbar-logo">Queue<em>Bite</em></span>
+          <div className="topbar-left">
+            {restInfo?.logoUrl && <div className="rest-logo"><img src={`https://queuebite.pythonanywhere.com${restInfo.logoUrl}`} alt="logo"/></div>}
+            <span className="topbar-name">{restInfo?.name}</span>
+          </div>
+          <span className="topbar-user">Hey, {customer?.name} 👋</span>
+        </div>
+      </div>
+      <div className="full-screen" style={{minHeight:'60vh'}}>
+        <div className="full-icon">⏸️</div>
+        <h1 className="full-title">Not taking orders right now</h1>
+        <p className="full-sub">The kitchen is currently closed. Please check back later.</p>
+      </div>
+      {pastOrders.length > 0 && (
+        <div className="wrap" style={{paddingBottom:40}}>
+          <div className="section-label">Order History</div>
+          {pastOrders.map(o=><PastOrderCard key={o.id} order={o}/>)}
+        </div>
+      )}
+      <BrandFooter/>
+    </div>
+  );
+}
+
+// ── Phone screen ──────────────────────────────────────
+function PhoneScreen({restInfo, onSubmit, loading, error}) {
+  const [phone, setPhone] = useState('');
+  const valid = /^[6-9]\d{9}$/.test(phone);
+  return (
+    <div>
+      <div className="center-screen">
+        <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
+          {restInfo?.logoUrl && <div className="rest-logo" style={{width:48,height:48,borderRadius:12}}><img src={`https://queuebite.pythonanywhere.com${restInfo.logoUrl}`} alt="logo"/></div>}
+          <div className="screen-logo" style={{marginBottom:0}}>{restInfo?.name || 'QueueBite'}</div>
+        </div>
+        <p className="screen-sub">Quick food ordering</p>
+        <h2 className="screen-title">Enter your phone number</h2>
+        <p className="screen-hint">We'll use this to track your orders<br/>and remember you next time.</p>
+        <input className="field" type="tel" maxLength={10} placeholder="10-digit mobile number"
+          value={phone} onChange={e=>setPhone(e.target.value.replace(/\D/g,''))}
+          onKeyDown={e=>e.key==='Enter'&&valid&&!loading&&onSubmit(phone)} autoFocus/>
+        <button className="btn-primary" disabled={!valid||loading} onClick={()=>onSubmit(phone)}>
+          {loading ? 'Checking…' : 'Continue →'}
+        </button>
+        {error && <p className="error-msg">{error}</p>}
+      </div>
+      <BrandFooter/>
+    </div>
+  );
+}
+
+// ── Register screen ───────────────────────────────────
+function RegisterScreen({phone, onSubmit, loading, error}) {
+  const [name, setName] = useState('');
+  return (
+    <div>
+      <div className="center-screen">
+        <div className="screen-logo">Queue<em>Bite</em></div>
+        <p className="screen-sub" style={{marginBottom:8}}>New here! 👋</p>
+        <p className="screen-hint" style={{marginBottom:8,color:'var(--muted)'}}>+91 {phone}</p>
+        <h2 className="screen-title">What's your name?</h2>
+        <p className="screen-hint">So the kitchen knows who to call.</p>
+        <input className="field" placeholder="Your name" value={name} onChange={e=>setName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&name.trim()&&!loading&&onSubmit(name.trim())} autoFocus/>
+        <button className="btn-primary" disabled={!name.trim()||loading} onClick={()=>onSubmit(name.trim())}>
+          {loading ? 'Saving…' : 'Start Ordering →'}
+        </button>
+        {error && <p className="error-msg">{error}</p>}
+      </div>
+      <BrandFooter/>
+    </div>
+  );
+}
+
+// ── Dashboard ─────────────────────────────────────────
+function Dashboard({customer, restInfo, activeOrders, pastOrders, onNewOrder, onCancelOrder, onRequestCancel}) {
+  return (
+    <div>
+      <div className="topbar">
+        <div className="topbar-inner">
+          <div className="topbar-left">
+            {restInfo?.logoUrl && <div className="rest-logo"><img src={`https://queuebite.pythonanywhere.com${restInfo.logoUrl}`} alt="logo"/></div>}
+            <span className="topbar-name">{restInfo?.name}</span>
+          </div>
           <span className="topbar-user">Hey, {customer.name} 👋</span>
         </div>
       </div>
       <div className="wrap page">
         <button className="new-order-btn" onClick={onNewOrder}>+ Place New Order</button>
-
         {activeOrders.length > 0 && (
           <>
             <div className="section-label">Live Order{activeOrders.length>1?'s':''}</div>
-            {activeOrders.map(o =>
-              <ActiveOrderCard key={o.id} order={o} onCancelOrder={onCancelOrder} onRequestCancel={onRequestCancel} />
-            )}
+            {activeOrders.map(o=><ActiveOrderCard key={o.id} order={o} onCancelOrder={onCancelOrder} onRequestCancel={onRequestCancel}/>)}
           </>
         )}
-
-        <div className="section-label" style={{marginTop: activeOrders.length?28:0}}>
+        <div className="section-label" style={{marginTop:activeOrders.length?28:0}}>
           Order History {pastOrders.length>0&&`(${pastOrders.length})`}
         </div>
         {pastOrders.length === 0
@@ -353,54 +454,42 @@ function Dashboard({customer, activeOrders, pastOrders, onNewOrder, onCancelOrde
           : pastOrders.map(o=><PastOrderCard key={o.id} order={o}/>)
         }
       </div>
+      <BrandFooter/>
     </div>
   );
 }
 
-// ─── Active order card ────────────────────────────────
+// ── Active order card ─────────────────────────────────
 function ActiveOrderCard({order, onCancelOrder, onRequestCancel}) {
   const [showConfirm, setShowConfirm] = useState(false);
 
-  // Declined — special card
   if (order.status === 'declined') {
     return (
       <div className="declined-card">
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
-          <div>
-            <span style={{fontWeight:700,fontSize:15}}>{order.id}</span>
-            <div style={{fontSize:13,color:'var(--red)',marginTop:2}}>Order was declined</div>
-          </div>
+          <div><span style={{fontWeight:700,fontSize:15}}>{order.id}</span><div style={{fontSize:13,color:'var(--red)',marginTop:2}}>Order was declined</div></div>
           <span style={{fontSize:11,fontWeight:700,background:'var(--red)',color:'#fff',padding:'4px 10px',borderRadius:20}}>Declined</span>
         </div>
-        <div style={{fontSize:13,color:'var(--muted)'}}>
-          {order.items.map((i,idx)=><span key={idx}>{i.qty}× {i.name}{idx<order.items.length-1?', ':''}</span>)}
-        </div>
+        <div style={{fontSize:13,color:'var(--muted)'}}>{order.items.map((i,idx)=><span key={idx}>{i.qty}× {i.name}{idx<order.items.length-1?', ':''}</span>)}</div>
         <div style={{fontSize:12,color:'var(--muted)',marginTop:8}}>Please speak to the counter for assistance.</div>
       </div>
     );
   }
 
-  const isPreCooking  = ['pending','accepted'].includes(order.status);
-  const isCooking     = ['preparing','ready'].includes(order.status);
-  const isCancelReq   = order.status === 'cancel_requested';
-  const stepIdx       = STATUS_STEPS.indexOf(order.status);
-  const msg           = STATUS_MSG[order.status] || STATUS_MSG.pending;
+  const isPreCooking = ['pending','accepted'].includes(order.status);
+  const isCancelReq  = order.status === 'cancel_requested';
+  const stepIdx      = STATUS_STEPS.indexOf(order.status);
+  const msg          = STATUS_MSG[order.status] || STATUS_MSG.pending;
 
   return (
     <div className="active-card" style={{marginBottom:14}}>
       <div className="active-card-header">
         <div>
           <span className="order-id">{order.id}</span>
-          <div className="order-meta">
-            {order.orderType==='dine-in'?'Dine In':'Takeaway'} · ₹{order.total} · {fmt(order.placedTs)}
-          </div>
+          <div className="order-meta">{order.orderType==='dine-in'?'Dine In':'Takeaway'} · ₹{order.total} · {fmt(order.placedTs)}</div>
         </div>
-        <span className={`order-type-pill ${order.orderType==='dine-in'?'pill-dine':'pill-take'}`}>
-          {order.orderType==='dine-in'?'Dine In':'Takeaway'}
-        </span>
+        <span className={`order-type-pill ${order.orderType==='dine-in'?'pill-dine':'pill-take'}`}>{order.orderType==='dine-in'?'Dine In':'Takeaway'}</span>
       </div>
-
-      {/* Step tracker — hidden for cancel_requested */}
       {!isCancelReq && (
         <div className="status-track">
           <div className="status-steps">
@@ -421,79 +510,42 @@ function ActiveOrderCard({order, onCancelOrder, onRequestCancel}) {
           </div>
         </div>
       )}
-
-      {/* Status message */}
-      <div className="status-message" style={{background:msg.bg,color:msg.color}}>
-        {msg.text}
-      </div>
-
-      {/* Items */}
+      <div className="status-message" style={{background:msg.bg,color:msg.color}}>{msg.text}</div>
       <div className="order-items-preview" style={{marginTop:10}}>
         {order.items.map((it,i)=><span key={i}>{it.qty}× {it.name}{i<order.items.length-1?', ':''}</span>)}
       </div>
-
-      {/* Cancel / Request cancel button */}
       {!showConfirm && !isCancelReq && (
         <button className="cancel-link" onClick={()=>setShowConfirm(true)}>
           {isPreCooking ? 'Cancel order' : 'Request cancellation'}
         </button>
       )}
-
-      {/* Inline confirmation */}
       {showConfirm && (
         <div className="confirm-box">
-          <p>
-            {isPreCooking
-              ? 'Cancel this order?'
-              : 'Request cancellation? The vendor will need to approve before your order is cancelled.'}
-          </p>
+          <p>{isPreCooking ? 'Cancel this order?' : 'Request cancellation? The vendor will need to approve.'}</p>
           <div className="confirm-btns">
-            <button className="confirm-yes" onClick={()=>{
-              if (isPreCooking) onCancelOrder(order.id);
-              else onRequestCancel(order.id, order.status);
-              setShowConfirm(false);
-            }}>
+            <button className="confirm-yes" onClick={()=>{ if(isPreCooking) onCancelOrder(order.id); else onRequestCancel(order.id,order.status); setShowConfirm(false); }}>
               {isPreCooking ? 'Yes, cancel' : 'Yes, request'}
             </button>
             <button className="confirm-no" onClick={()=>setShowConfirm(false)}>Keep order</button>
           </div>
         </div>
       )}
-
-      {/* Awaiting vendor message for cancel_requested */}
-      {isCancelReq && (
-        <div className="cancel-req-msg">
-          ⏳ Cancellation requested — waiting for vendor to respond.
-        </div>
-      )}
+      {isCancelReq && <div className="cancel-req-msg">⏳ Cancellation requested — waiting for vendor to respond.</div>}
     </div>
   );
 }
 
-// ─── Past order card ──────────────────────────────────
+// ── Past order card ───────────────────────────────────
 function PastOrderCard({order}) {
-  const statusMap = {
-    collected: {cls:'s-collected', label:'Collected'},
-    declined:  {cls:'s-declined',  label:'Declined'},
-    cancelled: {cls:'s-cancelled', label:'Cancelled'},
-  };
-  const s = statusMap[order.status] || {cls:'s-declined', label:order.status};
-
+  const statusMap = {collected:{cls:'s-collected',label:'Collected'},declined:{cls:'s-declined',label:'Declined'},cancelled:{cls:'s-cancelled',label:'Cancelled'}};
+  const s = statusMap[order.status] || {cls:'s-declined',label:order.status};
   return (
     <div className="past-order">
       <div className="past-order-header">
-        <div>
-          <span className="past-id">{order.id}</span>
-          <span style={{fontSize:12,color:'var(--muted)',marginLeft:8}}>
-            {order.orderType==='dine-in'?'Dine In':'Takeaway'}
-          </span>
-        </div>
+        <div><span className="past-id">{order.id}</span><span style={{fontSize:12,color:'var(--muted)',marginLeft:8}}>{order.orderType==='dine-in'?'Dine In':'Takeaway'}</span></div>
         <span className={`past-status ${s.cls}`}>{s.label}</span>
       </div>
-      <div className="past-items">
-        {order.items.map((it,i)=><span key={i}>{it.qty}× {it.name}{i<order.items.length-1?', ':''}</span>)}
-        {' · '}<strong style={{color:'var(--dark)'}}>₹{order.total}</strong>
-      </div>
+      <div className="past-items">{order.items.map((it,i)=><span key={i}>{it.qty}× {it.name}{i<order.items.length-1?', ':''}</span>)}{' · '}<strong style={{color:'var(--dark)'}}>₹{order.total}</strong></div>
       <div className="past-times">
         <div className="time-row">Placed: <strong>{fmt(order.placedTs)}</strong></div>
         {order.collectedTs && <div className="time-row">Collected: <strong>{fmt(order.collectedTs)}</strong></div>}
@@ -503,114 +555,86 @@ function PastOrderCard({order}) {
   );
 }
 
-// ─── Menu screen ──────────────────────────────────────
-function MenuScreen({menu, cart, updateCart, cartCount, cartTotal, onViewCart, onBack}) {
-  const byCategory = menu.reduce((acc, item) => {
-    acc[item.category] = acc[item.category] || [];
-    acc[item.category].push(item);
-    return acc;
-  }, {});
-
+// ── Menu screen ───────────────────────────────────────
+function MenuScreen({restInfo, menu, cart, updateCart, cartCount, cartTotal, onViewCart, onBack}) {
+  const byCategory = menu.reduce((acc,item)=>{ acc[item.category]=acc[item.category]||[]; acc[item.category].push(item); return acc; },{});
   return (
     <div>
       <div className="topbar">
         <div className="topbar-inner">
-          <span className="topbar-logo">Menu</span>
+          <div className="topbar-left">
+            {restInfo?.logoUrl && <div className="rest-logo"><img src={`https://queuebite.pythonanywhere.com${restInfo.logoUrl}`} alt="logo"/></div>}
+            <span className="topbar-name">Menu</span>
+          </div>
           <button className="back-btn" onClick={onBack}>← Back</button>
         </div>
       </div>
       <div className="wrap page">
-        {Object.entries(byCategory).map(([cat, items])=>(
+        {Object.entries(byCategory).map(([cat,items])=>(
           <div key={cat}>
             <h2 className="category-title">{cat}</h2>
             {items.map(item=>(
               <div key={item.id} className={`menu-item${!item.available?' off':''}`}>
                 <span className="item-emoji">{item.emoji}</span>
-                <div className="item-info">
-                  <div className="item-name">{item.name}</div>
-                  <div className="item-price">₹{item.price}</div>
-                  {!item.available && <div className="unavail-tag">Not available</div>}
-                </div>
-                {item.available && (
-                  cart[item.id]>0
-                    ? <div className="qty-ctrl">
-                        <button className="qbtn minus" onClick={()=>updateCart(item.id,-1)}>−</button>
-                        <span className="qnum">{cart[item.id]}</span>
-                        <button className="qbtn plus" onClick={()=>updateCart(item.id,1)}>+</button>
-                      </div>
-                    : <button className="add-btn" onClick={()=>updateCart(item.id,1)}>Add</button>
+                <div className="item-info"><div className="item-name">{item.name}</div><div className="item-price">₹{item.price}</div>{!item.available&&<div className="unavail-tag">Not available</div>}</div>
+                {item.available && (cart[item.id]>0
+                  ? <div className="qty-ctrl"><button className="qbtn minus" onClick={()=>updateCart(item.id,-1)}>−</button><span className="qnum">{cart[item.id]}</span><button className="qbtn plus" onClick={()=>updateCart(item.id,1)}>+</button></div>
+                  : <button className="add-btn" onClick={()=>updateCart(item.id,1)}>Add</button>
                 )}
               </div>
             ))}
           </div>
         ))}
-        {menu.length===0 && <div className="empty-state"><div className="empty-icon">⏳</div><p>Loading menu…</p></div>}
+        {menu.length===0&&<div className="empty-state"><div className="empty-icon">⏳</div><p>Loading menu…</p></div>}
       </div>
-      {cartCount>0 && (
-        <div className="cart-bar">
-          <div className="cart-bar-inner">
-            <div className="cart-bar-info">
-              <div className="lbl">{cartCount} item{cartCount!==1?'s':''}</div>
-              <div className="amt">₹{cartTotal}</div>
-            </div>
-            <button className="cart-bar-btn" onClick={onViewCart}>View Cart →</button>
-          </div>
-        </div>
-      )}
+      {cartCount>0&&<div className="cart-bar"><div className="cart-bar-inner"><div className="cart-bar-info"><div className="lbl">{cartCount} item{cartCount!==1?'s':''}</div><div className="amt">₹{cartTotal}</div></div><button className="cart-bar-btn" onClick={onViewCart}>View Cart →</button></div></div>}
     </div>
   );
 }
 
-// ─── Cart screen ──────────────────────────────────────
-function CartScreen({menu, cart, updateCart, cartTotal, orderType, setOrderType, onPlace, onBack, loading, error}) {
+// ── Cart screen ───────────────────────────────────────
+function CartScreen({restInfo, menu, cart, updateCart, cartTotal, orderType, setOrderType, onPlace, onBack, loading, error}) {
   return (
     <div>
       <div className="topbar">
         <div className="topbar-inner">
-          <span className="topbar-logo">Your Cart</span>
+          <div className="topbar-left">
+            {restInfo?.logoUrl&&<div className="rest-logo"><img src={`https://queuebite.pythonanywhere.com${restInfo.logoUrl}`} alt="logo"/></div>}
+            <span className="topbar-name">Your Cart</span>
+          </div>
           <button className="back-btn" onClick={onBack}>← Menu</button>
         </div>
       </div>
       <div className="wrap page">
         <div className="card">
           <div className="section-label">Order Summary</div>
-          {Object.entries(cart).map(([id, qty])=>{
-            const item = menu.find(m=>m.id===Number(id));
-            if (!item) return null;
-            return (
-              <div className="cart-row" key={id}>
-                <span style={{fontSize:20}}>{item.emoji}</span>
-                <div className="qty-ctrl" style={{gap:6}}>
-                  <button className="qbtn minus" style={{width:26,height:26,fontSize:16}} onClick={()=>updateCart(item.id,-1)}>−</button>
-                  <span className="qnum" style={{fontSize:13}}>{qty}</span>
-                  <button className="qbtn plus"  style={{width:26,height:26,fontSize:16}} onClick={()=>updateCart(item.id,1)}>+</button>
-                </div>
-                <span className="cart-name">{item.name}</span>
-                <span className="cart-sub">₹{item.price*qty}</span>
+          {Object.entries(cart).map(([id,qty])=>{
+            const item=menu.find(m=>m.id===Number(id)); if(!item) return null;
+            return (<div className="cart-row" key={id}>
+              <span style={{fontSize:20}}>{item.emoji}</span>
+              <div className="qty-ctrl" style={{gap:6}}>
+                <button className="qbtn minus" style={{width:26,height:26,fontSize:16}} onClick={()=>updateCart(item.id,-1)}>−</button>
+                <span className="qnum" style={{fontSize:13}}>{qty}</span>
+                <button className="qbtn plus" style={{width:26,height:26,fontSize:16}} onClick={()=>updateCart(item.id,1)}>+</button>
               </div>
-            );
+              <span className="cart-name">{item.name}</span>
+              <span className="cart-sub">₹{item.price*qty}</span>
+            </div>);
           })}
           <div className="total-row"><span>Total</span><span>₹{cartTotal}</span></div>
         </div>
-
         <div className="card">
           <div className="section-label">How will you have it?</div>
           <div className="type-grid">
-            <button className={`type-btn${orderType==='dine-in'?' active':''}`} onClick={()=>setOrderType('dine-in')}>
-              <em>🍽️</em><span>Dine In</span><span style={{fontSize:11,opacity:.7}}>Eat here</span>
-            </button>
-            <button className={`type-btn${orderType==='takeaway'?' active':''}`} onClick={()=>setOrderType('takeaway')}>
-              <em>🛍️</em><span>Takeaway</span><span style={{fontSize:11,opacity:.7}}>Pack to go</span>
-            </button>
+            <button className={`type-btn${orderType==='dine-in'?' active':''}`} onClick={()=>setOrderType('dine-in')}><em>🍽️</em><span>Dine In</span><span style={{fontSize:11,opacity:.7}}>Eat here</span></button>
+            <button className={`type-btn${orderType==='takeaway'?' active':''}`} onClick={()=>setOrderType('takeaway')}><em>🛍️</em><span>Takeaway</span><span style={{fontSize:11,opacity:.7}}>Pack to go</span></button>
           </div>
         </div>
-
-        {error && <p style={{color:'var(--red)',fontSize:13,textAlign:'center'}}>{error}</p>}
-        <button className="place-btn" onClick={onPlace} disabled={loading}>
-          {loading ? 'Placing Order…' : `Place Order · ₹${cartTotal}`}
-        </button>
+        {error&&<p style={{color:'var(--red)',fontSize:13,textAlign:'center'}}>{error}</p>}
+        <button className="place-btn" onClick={onPlace} disabled={loading}>{loading?'Placing Order…':`Place Order · ₹${cartTotal}`}</button>
         <p className="counter-note">Pay at the counter when your order is ready.</p>
       </div>
+      <BrandFooter/>
     </div>
   );
 }
