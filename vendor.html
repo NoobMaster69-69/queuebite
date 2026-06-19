@@ -4,9 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QueueBite — Kitchen</title>
-<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -176,24 +175,34 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel">
-const {useState, useEffect, useRef} = React;
+<script>
+const {
+  useState,
+  useEffect,
+  useRef
+} = React;
 const API = 'https://queuebite.pythonanywhere.com';
-
 const rid = new URLSearchParams(window.location.search).get('r');
-
-const authFetch = (path, opts={}, token=null) => {
-  const headers = {'Content-Type': 'application/json'};
+const authFetch = (path, opts = {}, token = null) => {
+  const headers = {
+    'Content-Type': 'application/json'
+  };
   if (token) headers['Authorization'] = `Bearer ${token}`;
-  return fetch(API+path, {
-    headers, ...opts,
-    body: opts.body ? JSON.stringify(opts.body) : undefined,
+  return fetch(API + path, {
+    headers,
+    ...opts,
+    body: opts.body ? JSON.stringify(opts.body) : undefined
   }).then(r => r.json());
 };
-
 function fmt(iso) {
   if (!iso) return '—';
-  return new Date(iso).toLocaleString('en-IN',{hour:'numeric',minute:'2-digit',hour12:true,day:'numeric',month:'short'});
+  return new Date(iso).toLocaleString('en-IN', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    day: 'numeric',
+    month: 'short'
+  });
 }
 
 // ── Audio ─────────────────────────────────────────────
@@ -205,79 +214,117 @@ function getCtx() {
 }
 function playTone(freq, delay, dur) {
   try {
-    const ctx = getCtx(), o = ctx.createOscillator(), g = ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
-    o.type = 'sine'; o.frequency.value = freq;
+    const ctx = getCtx(),
+      o = ctx.createOscillator(),
+      g = ctx.createGain();
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.type = 'sine';
+    o.frequency.value = freq;
     const t = ctx.currentTime + delay;
     g.gain.setValueAtTime(0.35, t);
     g.gain.exponentialRampToValueAtTime(0.001, t + dur);
-    o.start(t); o.stop(t + dur + 0.05);
-  } catch(e) {}
+    o.start(t);
+    o.stop(t + dur + 0.05);
+  } catch (e) {}
 }
-function playNewOrder()  { playTone(440,0,0.12); playTone(660,0.20,0.16); }
-function playCancelReq() { playTone(550,0,0.15); playTone(380,0.22,0.15); playTone(220,0.44,0.25); }
+function playNewOrder() {
+  playTone(440, 0, 0.12);
+  playTone(660, 0.20, 0.16);
+}
+function playCancelReq() {
+  playTone(550, 0, 0.15);
+  playTone(380, 0.22, 0.15);
+  playTone(220, 0.44, 0.25);
+}
 
 // ── Status maps ───────────────────────────────────────
 const STATUS_BADGE = {
-  pending:'b-pending', accepted:'b-accepted', preparing:'b-preparing',
-  ready:'b-ready', collected:'b-collected', declined:'b-declined',
-  cancel_requested:'b-cancel-req', cancelled:'b-cancelled',
+  pending: 'b-pending',
+  accepted: 'b-accepted',
+  preparing: 'b-preparing',
+  ready: 'b-ready',
+  collected: 'b-collected',
+  declined: 'b-declined',
+  cancel_requested: 'b-cancel-req',
+  cancelled: 'b-cancelled'
 };
 const STATUS_LABEL = {
-  pending:'Pending', accepted:'Accepted', preparing:'Preparing',
-  ready:'Ready to Collect', collected:'Collected', declined:'Declined',
-  cancel_requested:'Cancel Requested', cancelled:'Cancelled',
+  pending: 'Pending',
+  accepted: 'Accepted',
+  preparing: 'Preparing',
+  ready: 'Ready to Collect',
+  collected: 'Collected',
+  declined: 'Declined',
+  cancel_requested: 'Cancel Requested',
+  cancelled: 'Cancelled'
 };
 
 // ── App ───────────────────────────────────────────────
 function App() {
-  const [screen, setScreen]         = useState('loading');
-  const [restInfo, setRestInfo]     = useState(null);
-  const [token, setToken]           = useState(sessionStorage.getItem(`vt_${rid}`));
-  const [role, setRole]             = useState(sessionStorage.getItem(`vr_${rid}`));
-  const [staffName, setStaffName]   = useState(sessionStorage.getItem(`vn_${rid}`));
-  const [tab, setTab]               = useState('orders');
-  const [orders, setOrders]         = useState([]);
-  const [menu, setMenu]             = useState([]);
-  const [accepting, setAccepting]   = useState(false);
+  const [screen, setScreen] = useState('loading');
+  const [restInfo, setRestInfo] = useState(null);
+  const [token, setToken] = useState(sessionStorage.getItem(`vt_${rid}`));
+  const [role, setRole] = useState(sessionStorage.getItem(`vr_${rid}`));
+  const [staffName, setStaffName] = useState(sessionStorage.getItem(`vn_${rid}`));
+  const [tab, setTab] = useState('orders');
+  const [orders, setOrders] = useState([]);
+  const [menu, setMenu] = useState([]);
+  const [accepting, setAccepting] = useState(false);
   const [soundsEnabled, setSoundsEnabled] = useState(false);
-  const soundsRef     = useRef(false);
+  const soundsRef = useRef(false);
   const prevOrdersRef = useRef(null);
 
   // Redirect if no restaurant ID
   useEffect(() => {
-    if (!rid) { setScreen('no-id'); return; }
+    if (!rid) {
+      setScreen('no-id');
+      return;
+    }
     // Load restaurant info
     authFetch(`/r/${rid}/info`).then(info => {
-      if (info.error) { setScreen('not-found'); return; }
+      if (info.error) {
+        setScreen('not-found');
+        return;
+      }
       setRestInfo(info);
       setAccepting(info.acceptingOrders);
-      if (!token) { setScreen('login'); return; }
+      if (!token) {
+        setScreen('login');
+        return;
+      }
       // Validate existing session
       authFetch(`/v/${rid}/session`, {}, token).then(s => {
-        if (s.error) { clearSession(); setScreen('login'); return; }
+        if (s.error) {
+          clearSession();
+          setScreen('login');
+          return;
+        }
         setScreen('app');
       });
     });
   }, []);
-
   const clearSession = () => {
     sessionStorage.removeItem(`vt_${rid}`);
     sessionStorage.removeItem(`vr_${rid}`);
     sessionStorage.removeItem(`vn_${rid}`);
-    setToken(null); setRole(null); setStaffName(null);
+    setToken(null);
+    setRole(null);
+    setStaffName(null);
   };
-
   const handleLogin = (tok, r, name) => {
     sessionStorage.setItem(`vt_${rid}`, tok);
     sessionStorage.setItem(`vr_${rid}`, r);
     sessionStorage.setItem(`vn_${rid}`, name);
-    setToken(tok); setRole(r); setStaffName(name);
+    setToken(tok);
+    setRole(r);
+    setStaffName(name);
     setScreen('app');
   };
-
   const handleLogout = () => {
-    authFetch(`/v/${rid}/logout`, {method:'POST'}, token);
+    authFetch(`/v/${rid}/logout`, {
+      method: 'POST'
+    }, token);
     clearSession();
     setScreen('login');
   };
@@ -288,15 +335,17 @@ function App() {
     const onUnload = () => {
       fetch(API + `/v/${rid}/logout`, {
         method: 'POST',
-        headers: {'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json'},
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({}),
-        keepalive: true,
+        keepalive: true
       });
     };
     window.addEventListener('beforeunload', onUnload);
     return () => window.removeEventListener('beforeunload', onUnload);
   }, [token]);
-
   const loadOrders = () => {
     authFetch(`/r/${rid}/orders`, {}, token).then(data => {
       const newOrders = Array.isArray(data) ? data : [];
@@ -308,270 +357,553 @@ function App() {
       }
       prevOrdersRef.current = newOrders;
       setOrders(newOrders);
-    }).catch(()=>{});
+    }).catch(() => {});
   };
-
-  const loadMenu = () => authFetch(`/r/${rid}/menu`).then(d => setMenu(Array.isArray(d)?d:[])).catch(()=>{});
-
+  const loadMenu = () => authFetch(`/r/${rid}/menu`).then(d => setMenu(Array.isArray(d) ? d : [])).catch(() => {});
   useEffect(() => {
     if (screen !== 'app') return;
     loadOrders();
     const t = setInterval(loadOrders, 10000);
     return () => clearInterval(t);
   }, [screen, token]);
-
-  useEffect(() => { if (screen === 'app') loadMenu(); }, [screen, tab]);
+  useEffect(() => {
+    if (screen === 'app') loadMenu();
+  }, [screen, tab]);
 
   // Poll restaurant info for accepting status changes
   useEffect(() => {
     if (screen !== 'app') return;
     const t = setInterval(() => {
-      authFetch(`/r/${rid}/info`).then(info => { if (!info.error) setAccepting(info.acceptingOrders); });
+      authFetch(`/r/${rid}/info`).then(info => {
+        if (!info.error) setAccepting(info.acceptingOrders);
+      });
     }, 10000);
     return () => clearInterval(t);
   }, [screen]);
-
   const toggleAccepting = async () => {
     const next = !accepting;
-    const res = await authFetch(`/r/${rid}/accepting`, {method:'PATCH', body:{accepting:next}}, token);
+    const res = await authFetch(`/r/${rid}/accepting`, {
+      method: 'PATCH',
+      body: {
+        accepting: next
+      }
+    }, token);
     if (res.ok) setAccepting(next);
   };
-
   const toggleSounds = () => {
     const next = !soundsRef.current;
     soundsRef.current = next;
     setSoundsEnabled(next);
     if (next) playNewOrder();
   };
-
-  const updateStatus = async (id, status, extra={}) => {
-    const raw = id.replace('#','');
-    await authFetch(`/r/${rid}/orders/${raw}`, {method:'PATCH', body:{status,...extra}}, token);
+  const updateStatus = async (id, status, extra = {}) => {
+    const raw = id.replace('#', '');
+    await authFetch(`/r/${rid}/orders/${raw}`, {
+      method: 'PATCH',
+      body: {
+        status,
+        ...extra
+      }
+    }, token);
     loadOrders();
   };
-
-  const toggleMenu   = async (item) => { await authFetch(`/r/${rid}/menu/${item.id}`, {method:'PATCH', body:{available:!item.available}}, token); loadMenu(); };
-  const deleteMenuItem = async (item) => { await authFetch(`/r/${rid}/menu/${item.id}`, {method:'DELETE'}, token); loadMenu(); };
-  const addMenuItem  = async (item)  => { await authFetch(`/r/${rid}/menu`, {method:'POST', body:item}, token); loadMenu(); };
-
-  const pendingCount   = orders.filter(o => o.status==='pending').length;
-  const cancelReqCount = orders.filter(o => o.status==='cancel_requested').length;
-  const alertCount     = pendingCount + cancelReqCount;
-  const activeCount    = orders.filter(o => ['accepted','preparing','ready'].includes(o.status)).length;
-  const completedCount = orders.filter(o => ['collected','declined','cancelled'].includes(o.status)).length;
-
-  if (screen === 'loading') return <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'100vh',color:'var(--muted)'}}>Loading…</div>;
-  if (screen === 'no-id')   return <ErrorScreen msg="No restaurant ID in URL. Use vendor.html?r=RESTAURANT_ID"/>;
-  if (screen === 'not-found') return <ErrorScreen msg="Restaurant not found."/>;
-  if (screen === 'login')   return <LoginScreen restInfo={restInfo} onLogin={handleLogin}/>;
-
-  return (
-    <div>
-      <div className="topbar">
-        <div className="topbar-inner">
-          <div className="topbar-left">
-            <div className="topbar-rest-logo">
-              {restInfo?.logoUrl ? <img src={`${API}${restInfo.logoUrl}`} alt="logo"/> : '🍽️'}
-            </div>
-            <div>
-              <div className="topbar-rest-name">{restInfo?.name}</div>
-              <div className="topbar-user">{staffName} · {role}</div>
-            </div>
-          </div>
-          <div className="topbar-right">
-            {cancelReqCount > 0 && <span className="topbar-badge red">⚠ {cancelReqCount}</span>}
-            {pendingCount > 0 && <span className="topbar-badge">{pendingCount} new</span>}
-            {role === 'manager' && (
-              <div className="accepting-pill" title="Toggle order acceptance">
-                <div className={`accepting-dot ${accepting?'on':'off'}`}/>
-                <span className="accepting-label">{accepting ? 'Open' : 'Paused'}</span>
-                <label className="toggle-sm" style={{marginLeft:4}}>
-                  <input type="checkbox" checked={accepting} onChange={toggleAccepting}/>
-                  <span className="slider-sm"></span>
-                </label>
-              </div>
-            )}
-            <button style={{background:'rgba(255,255,255,.12)',color:soundsEnabled?'#fff':'rgba(255,255,255,.6)',padding:'6px 10px',borderRadius:8,fontSize:12,fontWeight:600,border:'1px solid rgba(255,255,255,.2)'}} onClick={toggleSounds}>
-              {soundsEnabled ? '🔔' : '🔕'}
-            </button>
-            <button className="logout-btn" onClick={handleLogout}>Logout</button>
-          </div>
-        </div>
-      </div>
-
-      <div className="tabs">
-        <div className="tabs-inner">
-          <button className={`tab${tab==='orders'?' active':''}`} onClick={()=>setTab('orders')}>
-            Orders {alertCount>0 && <span className="tab-count">{alertCount}</span>}
-          </button>
-          {role === 'manager' && (
-            <button className={`tab${tab==='menu'?' active':''}`} onClick={()=>setTab('menu')}>Menu</button>
-          )}
-        </div>
-      </div>
-
-      {tab === 'orders'
-        ? <OrdersTab orders={orders} onUpdateStatus={updateStatus} pendingCount={pendingCount} activeCount={activeCount} completedCount={completedCount} cancelReqCount={cancelReqCount}/>
-        : <MenuTab menu={menu} onToggle={toggleMenu} onDelete={deleteMenuItem} onAdd={addMenuItem}/>
+  const toggleMenu = async item => {
+    await authFetch(`/r/${rid}/menu/${item.id}`, {
+      method: 'PATCH',
+      body: {
+        available: !item.available
       }
-    </div>
-  );
+    }, token);
+    loadMenu();
+  };
+  const deleteMenuItem = async item => {
+    await authFetch(`/r/${rid}/menu/${item.id}`, {
+      method: 'DELETE'
+    }, token);
+    loadMenu();
+  };
+  const addMenuItem = async item => {
+    await authFetch(`/r/${rid}/menu`, {
+      method: 'POST',
+      body: item
+    }, token);
+    loadMenu();
+  };
+  const pendingCount = orders.filter(o => o.status === 'pending').length;
+  const cancelReqCount = orders.filter(o => o.status === 'cancel_requested').length;
+  const alertCount = pendingCount + cancelReqCount;
+  const activeCount = orders.filter(o => ['accepted', 'preparing', 'ready'].includes(o.status)).length;
+  const completedCount = orders.filter(o => ['collected', 'declined', 'cancelled'].includes(o.status)).length;
+  if (screen === 'loading') return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100vh',
+      color: 'var(--muted)'
+    }
+  }, "Loading\u2026");
+  if (screen === 'no-id') return /*#__PURE__*/React.createElement(ErrorScreen, {
+    msg: "No restaurant ID in URL. Use vendor.html?r=RESTAURANT_ID"
+  });
+  if (screen === 'not-found') return /*#__PURE__*/React.createElement(ErrorScreen, {
+    msg: "Restaurant not found."
+  });
+  if (screen === 'login') return /*#__PURE__*/React.createElement(LoginScreen, {
+    restInfo: restInfo,
+    onLogin: handleLogin
+  });
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "topbar"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "topbar-inner"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "topbar-left"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "topbar-rest-logo"
+  }, restInfo?.logoUrl ? /*#__PURE__*/React.createElement("img", {
+    src: `${API}${restInfo.logoUrl}`,
+    alt: "logo"
+  }) : '🍽️'), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "topbar-rest-name"
+  }, restInfo?.name), /*#__PURE__*/React.createElement("div", {
+    className: "topbar-user"
+  }, staffName, " \xB7 ", role))), /*#__PURE__*/React.createElement("div", {
+    className: "topbar-right"
+  }, cancelReqCount > 0 && /*#__PURE__*/React.createElement("span", {
+    className: "topbar-badge red"
+  }, "\u26A0 ", cancelReqCount), pendingCount > 0 && /*#__PURE__*/React.createElement("span", {
+    className: "topbar-badge"
+  }, pendingCount, " new"), role === 'manager' && /*#__PURE__*/React.createElement("div", {
+    className: "accepting-pill",
+    title: "Toggle order acceptance"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: `accepting-dot ${accepting ? 'on' : 'off'}`
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "accepting-label"
+  }, accepting ? 'Open' : 'Paused'), /*#__PURE__*/React.createElement("label", {
+    className: "toggle-sm",
+    style: {
+      marginLeft: 4
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: accepting,
+    onChange: toggleAccepting
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "slider-sm"
+  }))), /*#__PURE__*/React.createElement("button", {
+    style: {
+      background: 'rgba(255,255,255,.12)',
+      color: soundsEnabled ? '#fff' : 'rgba(255,255,255,.6)',
+      padding: '6px 10px',
+      borderRadius: 8,
+      fontSize: 12,
+      fontWeight: 600,
+      border: '1px solid rgba(255,255,255,.2)'
+    },
+    onClick: toggleSounds
+  }, soundsEnabled ? '🔔' : '🔕'), /*#__PURE__*/React.createElement("button", {
+    className: "logout-btn",
+    onClick: handleLogout
+  }, "Logout")))), /*#__PURE__*/React.createElement("div", {
+    className: "tabs"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "tabs-inner"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: `tab${tab === 'orders' ? ' active' : ''}`,
+    onClick: () => setTab('orders')
+  }, "Orders ", alertCount > 0 && /*#__PURE__*/React.createElement("span", {
+    className: "tab-count"
+  }, alertCount)), role === 'manager' && /*#__PURE__*/React.createElement("button", {
+    className: `tab${tab === 'menu' ? ' active' : ''}`,
+    onClick: () => setTab('menu')
+  }, "Menu"))), tab === 'orders' ? /*#__PURE__*/React.createElement(OrdersTab, {
+    orders: orders,
+    onUpdateStatus: updateStatus,
+    pendingCount: pendingCount,
+    activeCount: activeCount,
+    completedCount: completedCount,
+    cancelReqCount: cancelReqCount
+  }) : /*#__PURE__*/React.createElement(MenuTab, {
+    menu: menu,
+    onToggle: toggleMenu,
+    onDelete: deleteMenuItem,
+    onAdd: addMenuItem
+  }));
 }
 
 // ── Login screen ──────────────────────────────────────
-function LoginScreen({restInfo, onLogin}) {
+function LoginScreen({
+  restInfo,
+  onLogin
+}) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError]       = useState('');
-  const [loading, setLoading]   = useState(false);
-
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const submit = async () => {
-    setLoading(true); setError('');
-    const res = await authFetch(`/v/${rid}/login`, {method:'POST', body:{username, password}});
-    if (res.token) onLogin(res.token, res.role, res.name);
-    else { setError(res.error || 'Login failed'); setLoading(false); }
+    setLoading(true);
+    setError('');
+    const res = await authFetch(`/v/${rid}/login`, {
+      method: 'POST',
+      body: {
+        username,
+        password
+      }
+    });
+    if (res.token) onLogin(res.token, res.role, res.name);else {
+      setError(res.error || 'Login failed');
+      setLoading(false);
+    }
   };
-
-  return (
-    <div className="login-wrap">
-      <div className="login-card">
-        <div className="login-header">
-          <div className="login-logo">
-            {restInfo?.logoUrl ? <img src={`${API}${restInfo.logoUrl}`} alt="logo"/> : '🍽️'}
-          </div>
-          <div className="login-rest-name">{restInfo?.name || 'QueueBite'}</div>
-        </div>
-        <div className="login-sub">Kitchen Panel</div>
-        <h2 className="login-title">Staff Login</h2>
-        <p className="login-hint">Enter your credentials to continue.</p>
-        {error && <div className="error-msg">{error}</div>}
-        <label className="field-label">Username</label>
-        <input className="field" placeholder="Username" value={username} onChange={e=>setUsername(e.target.value)} autoFocus/>
-        <label className="field-label">Password</label>
-        <input className="field" type="password" placeholder="Password" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==='Enter'&&!loading&&submit()}/>
-        <button className="btn-login" onClick={submit} disabled={loading||!username||!password}>
-          {loading ? 'Signing in…' : 'Sign In'}
-        </button>
-        <div className="login-brand">
-          <div className="es-badge">Es</div>
-          QueueBite by EasyServe
-        </div>
-      </div>
-    </div>
-  );
+  return /*#__PURE__*/React.createElement("div", {
+    className: "login-wrap"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "login-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "login-header"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "login-logo"
+  }, restInfo?.logoUrl ? /*#__PURE__*/React.createElement("img", {
+    src: `${API}${restInfo.logoUrl}`,
+    alt: "logo"
+  }) : '🍽️'), /*#__PURE__*/React.createElement("div", {
+    className: "login-rest-name"
+  }, restInfo?.name || 'QueueBite')), /*#__PURE__*/React.createElement("div", {
+    className: "login-sub"
+  }, "Kitchen Panel"), /*#__PURE__*/React.createElement("h2", {
+    className: "login-title"
+  }, "Staff Login"), /*#__PURE__*/React.createElement("p", {
+    className: "login-hint"
+  }, "Enter your credentials to continue."), error && /*#__PURE__*/React.createElement("div", {
+    className: "error-msg"
+  }, error), /*#__PURE__*/React.createElement("label", {
+    className: "field-label"
+  }, "Username"), /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    placeholder: "Username",
+    value: username,
+    onChange: e => setUsername(e.target.value),
+    autoFocus: true
+  }), /*#__PURE__*/React.createElement("label", {
+    className: "field-label"
+  }, "Password"), /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    type: "password",
+    placeholder: "Password",
+    value: password,
+    onChange: e => setPassword(e.target.value),
+    onKeyDown: e => e.key === 'Enter' && !loading && submit()
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn-login",
+    onClick: submit,
+    disabled: loading || !username || !password
+  }, loading ? 'Signing in…' : 'Sign In'), /*#__PURE__*/React.createElement("div", {
+    className: "login-brand"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "es-badge"
+  }, "Es"), "QueueBite by EasyServe")));
 }
-
-function ErrorScreen({msg}) {
-  return <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'100vh',color:'var(--muted)',textAlign:'center',padding:24}}><div><div style={{fontSize:40,marginBottom:12}}>⚠️</div><p>{msg}</p></div></div>;
+function ErrorScreen({
+  msg
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100vh',
+      color: 'var(--muted)',
+      textAlign: 'center',
+      padding: 24
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 40,
+      marginBottom: 12
+    }
+  }, "\u26A0\uFE0F"), /*#__PURE__*/React.createElement("p", null, msg)));
 }
 
 // ── Orders tab ────────────────────────────────────────
-function OrdersTab({orders, onUpdateStatus, pendingCount, activeCount, completedCount, cancelReqCount}) {
+function OrdersTab({
+  orders,
+  onUpdateStatus,
+  pendingCount,
+  activeCount,
+  completedCount,
+  cancelReqCount
+}) {
   const needsAttention = orders.filter(o => o.status === 'cancel_requested');
-  const pending        = orders.filter(o => o.status === 'pending');
-  const active         = orders.filter(o => ['accepted','preparing','ready'].includes(o.status));
-  const completed      = orders.filter(o => ['collected','declined','cancelled'].includes(o.status));
-
-  return (
-    <div className="wrap">
-      <div className="stats-bar">
-        <div className="stat-card"><div className="stat-num" style={{color:'var(--amber)'}}>{pendingCount}</div><div className="stat-lbl">Pending</div></div>
-        <div className="stat-card"><div className="stat-num" style={{color:'var(--blue)'}}>{activeCount}</div><div className="stat-lbl">Active</div></div>
-        <div className="stat-card"><div className="stat-num" style={{color:'var(--green)'}}>{completedCount}</div><div className="stat-lbl">Completed</div></div>
-        <div className="stat-card"><div className="stat-num" style={{color:'var(--dark)'}}>{orders.length}</div><div className="stat-lbl">Total</div></div>
-      </div>
-      {orders.length === 0 && <div className="empty-state"><div className="empty-icon">🔔</div><p>No orders yet.<br/>Customer orders appear here automatically.</p></div>}
-      {needsAttention.length > 0 && <><div className="section-label alert">⚠ Needs Attention ({needsAttention.length})</div>{needsAttention.map(o=><OrderCard key={o.id} order={o} onUpdateStatus={onUpdateStatus}/>)}</>}
-      {pending.length > 0 && <div className={needsAttention.length?'section-gap':''}><div className="section-label">Incoming ({pending.length})</div>{pending.map(o=><OrderCard key={o.id} order={o} onUpdateStatus={onUpdateStatus}/>)}</div>}
-      {active.length  > 0 && <div className={(needsAttention.length||pending.length)?'section-gap':''}><div className="section-label">Active ({active.length})</div>{active.map(o=><OrderCard key={o.id} order={o} onUpdateStatus={onUpdateStatus}/>)}</div>}
-      {completed.length > 0 && <div className={(needsAttention.length||pending.length||active.length)?'section-gap':''}><div className="section-label">Completed</div>{completed.map(o=><OrderCard key={o.id} order={o} onUpdateStatus={onUpdateStatus}/>)}</div>}
-    </div>
-  );
+  const pending = orders.filter(o => o.status === 'pending');
+  const active = orders.filter(o => ['accepted', 'preparing', 'ready'].includes(o.status));
+  const completed = orders.filter(o => ['collected', 'declined', 'cancelled'].includes(o.status));
+  return /*#__PURE__*/React.createElement("div", {
+    className: "wrap"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stats-bar"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stat-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stat-num",
+    style: {
+      color: 'var(--amber)'
+    }
+  }, pendingCount), /*#__PURE__*/React.createElement("div", {
+    className: "stat-lbl"
+  }, "Pending")), /*#__PURE__*/React.createElement("div", {
+    className: "stat-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stat-num",
+    style: {
+      color: 'var(--blue)'
+    }
+  }, activeCount), /*#__PURE__*/React.createElement("div", {
+    className: "stat-lbl"
+  }, "Active")), /*#__PURE__*/React.createElement("div", {
+    className: "stat-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stat-num",
+    style: {
+      color: 'var(--green)'
+    }
+  }, completedCount), /*#__PURE__*/React.createElement("div", {
+    className: "stat-lbl"
+  }, "Completed")), /*#__PURE__*/React.createElement("div", {
+    className: "stat-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stat-num",
+    style: {
+      color: 'var(--dark)'
+    }
+  }, orders.length), /*#__PURE__*/React.createElement("div", {
+    className: "stat-lbl"
+  }, "Total"))), orders.length === 0 && /*#__PURE__*/React.createElement("div", {
+    className: "empty-state"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "empty-icon"
+  }, "\uD83D\uDD14"), /*#__PURE__*/React.createElement("p", null, "No orders yet.", /*#__PURE__*/React.createElement("br", null), "Customer orders appear here automatically.")), needsAttention.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "section-label alert"
+  }, "\u26A0 Needs Attention (", needsAttention.length, ")"), needsAttention.map(o => /*#__PURE__*/React.createElement(OrderCard, {
+    key: o.id,
+    order: o,
+    onUpdateStatus: onUpdateStatus
+  }))), pending.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: needsAttention.length ? 'section-gap' : ''
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-label"
+  }, "Incoming (", pending.length, ")"), pending.map(o => /*#__PURE__*/React.createElement(OrderCard, {
+    key: o.id,
+    order: o,
+    onUpdateStatus: onUpdateStatus
+  }))), active.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: needsAttention.length || pending.length ? 'section-gap' : ''
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-label"
+  }, "Active (", active.length, ")"), active.map(o => /*#__PURE__*/React.createElement(OrderCard, {
+    key: o.id,
+    order: o,
+    onUpdateStatus: onUpdateStatus
+  }))), completed.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: needsAttention.length || pending.length || active.length ? 'section-gap' : ''
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-label"
+  }, "Completed"), completed.map(o => /*#__PURE__*/React.createElement(OrderCard, {
+    key: o.id,
+    order: o,
+    onUpdateStatus: onUpdateStatus
+  }))));
 }
-
-function OrderCard({order, onUpdateStatus}) {
-  const badge     = STATUS_BADGE[order.status] || 'b-pending';
-  const label     = STATUS_LABEL[order.status] || order.status;
+function OrderCard({
+  order,
+  onUpdateStatus
+}) {
+  const badge = STATUS_BADGE[order.status] || 'b-pending';
+  const label = STATUS_LABEL[order.status] || order.status;
   const cardClass = order.status === 'cancel_requested' ? 'cancel-req' : order.status;
-  const isCancelReq    = order.status === 'cancel_requested';
-  const canVendorCancel = ['accepted','preparing','ready'].includes(order.status);
-
-  return (
-    <div className={`order-card ${cardClass}`}>
-      <div className="order-top">
-        <div>
-          <span className="order-id">{order.id}</span>
-          <div className="order-meta"><strong style={{color:'var(--dark)'}}>{order.customerName}</strong> · +91 {order.phone}</div>
-          <div className="order-meta" style={{marginTop:2}}>
-            <span className={`order-type-pill ${order.orderType==='dine-in'?'pill-dine':'pill-take'}`}>{order.orderType==='dine-in'?'Dine In':'Takeaway'}</span>
-          </div>
-        </div>
-        <span className={`status-badge ${badge}`}>{label}</span>
-      </div>
-      {isCancelReq && <div className="cancel-alert">⚠ Customer has requested cancellation</div>}
-      <div className="order-items">{order.items.map((it,i)=><span key={i}><strong>{it.qty}×</strong> {it.name}{i<order.items.length-1?', ':''}</span>)}</div>
-      <div className="order-total-line">Total: ₹{order.total}</div>
-      <div className="order-times">
-        <div>Placed: <strong>{fmt(order.placedTs)}</strong></div>
-        {order.collectedTs && <div>Collected: <strong>{fmt(order.collectedTs)}</strong></div>}
-        {order.cancelledTs && <div>Cancelled: <strong>{fmt(order.cancelledTs)}</strong></div>}
-      </div>
-      <div className="actions">
-        {order.status==='pending' && <><button className="abtn abtn-accept" onClick={()=>onUpdateStatus(order.id,'accepted')}>✓ Accept</button><button className="abtn abtn-decline" onClick={()=>onUpdateStatus(order.id,'declined')}>✕ Decline</button></>}
-        {order.status==='accepted'  && <button className="abtn abtn-prepare" onClick={()=>onUpdateStatus(order.id,'preparing')}>🔥 Mark Preparing</button>}
-        {order.status==='preparing' && <button className="abtn abtn-ready"   onClick={()=>onUpdateStatus(order.id,'ready')}>🔔 Ready to Collect</button>}
-        {order.status==='ready'     && <button className="abtn abtn-collect" onClick={()=>onUpdateStatus(order.id,'collected')}>✓ Mark Collected</button>}
-        {isCancelReq && <><button className="abtn abtn-approve" onClick={()=>onUpdateStatus(order.id,'cancelled',{cancelledBy:'vendor_approved'})}>✓ Approve Cancel</button><button className="abtn abtn-deny" onClick={()=>onUpdateStatus(order.id,order.cancelRequestedFrom||'preparing',{cancelRequestedFrom:null})}>✕ Deny, Resume</button></>}
-        {canVendorCancel && <button className="abtn abtn-cancel" onClick={()=>{if(window.confirm(`Cancel order ${order.id}?`))onUpdateStatus(order.id,'cancelled',{cancelledBy:'vendor'})}}>✕ Cancel Order</button>}
-      </div>
-    </div>
-  );
+  const isCancelReq = order.status === 'cancel_requested';
+  const canVendorCancel = ['accepted', 'preparing', 'ready'].includes(order.status);
+  return /*#__PURE__*/React.createElement("div", {
+    className: `order-card ${cardClass}`
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "order-top"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "order-id"
+  }, order.id), /*#__PURE__*/React.createElement("div", {
+    className: "order-meta"
+  }, /*#__PURE__*/React.createElement("strong", {
+    style: {
+      color: 'var(--dark)'
+    }
+  }, order.customerName), " \xB7 +91 ", order.phone), /*#__PURE__*/React.createElement("div", {
+    className: "order-meta",
+    style: {
+      marginTop: 2
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: `order-type-pill ${order.orderType === 'dine-in' ? 'pill-dine' : 'pill-take'}`
+  }, order.orderType === 'dine-in' ? 'Dine In' : 'Takeaway'))), /*#__PURE__*/React.createElement("span", {
+    className: `status-badge ${badge}`
+  }, label)), isCancelReq && /*#__PURE__*/React.createElement("div", {
+    className: "cancel-alert"
+  }, "\u26A0 Customer has requested cancellation"), /*#__PURE__*/React.createElement("div", {
+    className: "order-items"
+  }, order.items.map((it, i) => /*#__PURE__*/React.createElement("span", {
+    key: i
+  }, /*#__PURE__*/React.createElement("strong", null, it.qty, "\xD7"), " ", it.name, i < order.items.length - 1 ? ', ' : ''))), /*#__PURE__*/React.createElement("div", {
+    className: "order-total-line"
+  }, "Total: \u20B9", order.total), /*#__PURE__*/React.createElement("div", {
+    className: "order-times"
+  }, /*#__PURE__*/React.createElement("div", null, "Placed: ", /*#__PURE__*/React.createElement("strong", null, fmt(order.placedTs))), order.collectedTs && /*#__PURE__*/React.createElement("div", null, "Collected: ", /*#__PURE__*/React.createElement("strong", null, fmt(order.collectedTs))), order.cancelledTs && /*#__PURE__*/React.createElement("div", null, "Cancelled: ", /*#__PURE__*/React.createElement("strong", null, fmt(order.cancelledTs)))), /*#__PURE__*/React.createElement("div", {
+    className: "actions"
+  }, order.status === 'pending' && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+    className: "abtn abtn-accept",
+    onClick: () => onUpdateStatus(order.id, 'accepted')
+  }, "\u2713 Accept"), /*#__PURE__*/React.createElement("button", {
+    className: "abtn abtn-decline",
+    onClick: () => onUpdateStatus(order.id, 'declined')
+  }, "\u2715 Decline")), order.status === 'accepted' && /*#__PURE__*/React.createElement("button", {
+    className: "abtn abtn-prepare",
+    onClick: () => onUpdateStatus(order.id, 'preparing')
+  }, "\uD83D\uDD25 Mark Preparing"), order.status === 'preparing' && /*#__PURE__*/React.createElement("button", {
+    className: "abtn abtn-ready",
+    onClick: () => onUpdateStatus(order.id, 'ready')
+  }, "\uD83D\uDD14 Ready to Collect"), order.status === 'ready' && /*#__PURE__*/React.createElement("button", {
+    className: "abtn abtn-collect",
+    onClick: () => onUpdateStatus(order.id, 'collected')
+  }, "\u2713 Mark Collected"), isCancelReq && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+    className: "abtn abtn-approve",
+    onClick: () => onUpdateStatus(order.id, 'cancelled', {
+      cancelledBy: 'vendor_approved'
+    })
+  }, "\u2713 Approve Cancel"), /*#__PURE__*/React.createElement("button", {
+    className: "abtn abtn-deny",
+    onClick: () => onUpdateStatus(order.id, order.cancelRequestedFrom || 'preparing', {
+      cancelRequestedFrom: null
+    })
+  }, "\u2715 Deny, Resume")), canVendorCancel && /*#__PURE__*/React.createElement("button", {
+    className: "abtn abtn-cancel",
+    onClick: () => {
+      if (window.confirm(`Cancel order ${order.id}?`)) onUpdateStatus(order.id, 'cancelled', {
+        cancelledBy: 'vendor'
+      });
+    }
+  }, "\u2715 Cancel Order")));
 }
 
 // ── Menu tab ──────────────────────────────────────────
-function MenuTab({menu, onToggle, onDelete, onAdd}) {
-  const [form, setForm] = useState({name:'',price:'',category:'',emoji:'🍽️'});
-  const cats = [...new Set(menu.map(m=>m.category))];
-
+function MenuTab({
+  menu,
+  onToggle,
+  onDelete,
+  onAdd
+}) {
+  const [form, setForm] = useState({
+    name: '',
+    price: '',
+    category: '',
+    emoji: '🍽️'
+  });
+  const cats = [...new Set(menu.map(m => m.category))];
   const handleAdd = () => {
-    if (!form.name.trim()||!form.price||!form.category.trim()) return;
-    onAdd({name:form.name.trim(),price:Number(form.price),category:form.category.trim(),emoji:form.emoji||'🍽️'});
-    setForm({name:'',price:'',category:'',emoji:'🍽️'});
+    if (!form.name.trim() || !form.price || !form.category.trim()) return;
+    onAdd({
+      name: form.name.trim(),
+      price: Number(form.price),
+      category: form.category.trim(),
+      emoji: form.emoji || '🍽️'
+    });
+    setForm({
+      name: '',
+      price: '',
+      category: '',
+      emoji: '🍽️'
+    });
   };
-
-  return (
-    <div className="wrap">
-      {cats.map(cat=>(
-        <div key={cat} style={{marginBottom:8}}>
-          <div className="section-label">{cat}</div>
-          {menu.filter(m=>m.category===cat).map(item=>(
-            <div key={item.id} className="menu-item-row">
-              <span className="mi-emoji">{item.emoji}</span>
-              <div className="mi-info"><div className="mi-name">{item.name}</div><div className="mi-sub">₹{item.price}</div></div>
-              <span className={`avail-label ${item.available?'avail-on':'avail-off'}`}>{item.available?'Available':'Off'}</span>
-              <label className="toggle"><input type="checkbox" checked={item.available} onChange={()=>onToggle(item)}/><span className="slider"></span></label>
-              <button className="del-btn" onClick={()=>{if(window.confirm(`Remove "${item.name}"?`))onDelete(item)}}>✕</button>
-            </div>
-          ))}
-        </div>
-      ))}
-      <div className="add-form">
-        <div className="add-form-title">Add new item</div>
-        <div className="form-grid">
-          <input className="finput" placeholder="Item name" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/>
-          <input className="finput" placeholder="Price (₹)" type="number" value={form.price} onChange={e=>setForm({...form,price:e.target.value})}/>
-        </div>
-        <div className="form-grid">
-          <input className="finput" placeholder="Category" value={form.category} onChange={e=>setForm({...form,category:e.target.value})}/>
-          <input className="finput" placeholder="Emoji (e.g. 🍛)" value={form.emoji} onChange={e=>setForm({...form,emoji:e.target.value})}/>
-        </div>
-        <button className="add-btn" onClick={handleAdd} disabled={!form.name.trim()||!form.price||!form.category.trim()}>Add to Menu</button>
-      </div>
-    </div>
-  );
+  return /*#__PURE__*/React.createElement("div", {
+    className: "wrap"
+  }, cats.map(cat => /*#__PURE__*/React.createElement("div", {
+    key: cat,
+    style: {
+      marginBottom: 8
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-label"
+  }, cat), menu.filter(m => m.category === cat).map(item => /*#__PURE__*/React.createElement("div", {
+    key: item.id,
+    className: "menu-item-row"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "mi-emoji"
+  }, item.emoji), /*#__PURE__*/React.createElement("div", {
+    className: "mi-info"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "mi-name"
+  }, item.name), /*#__PURE__*/React.createElement("div", {
+    className: "mi-sub"
+  }, "\u20B9", item.price)), /*#__PURE__*/React.createElement("span", {
+    className: `avail-label ${item.available ? 'avail-on' : 'avail-off'}`
+  }, item.available ? 'Available' : 'Off'), /*#__PURE__*/React.createElement("label", {
+    className: "toggle"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: item.available,
+    onChange: () => onToggle(item)
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "slider"
+  })), /*#__PURE__*/React.createElement("button", {
+    className: "del-btn",
+    onClick: () => {
+      if (window.confirm(`Remove "${item.name}"?`)) onDelete(item);
+    }
+  }, "\u2715"))))), /*#__PURE__*/React.createElement("div", {
+    className: "add-form"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "add-form-title"
+  }, "Add new item"), /*#__PURE__*/React.createElement("div", {
+    className: "form-grid"
+  }, /*#__PURE__*/React.createElement("input", {
+    className: "finput",
+    placeholder: "Item name",
+    value: form.name,
+    onChange: e => setForm({
+      ...form,
+      name: e.target.value
+    })
+  }), /*#__PURE__*/React.createElement("input", {
+    className: "finput",
+    placeholder: "Price (\u20B9)",
+    type: "number",
+    value: form.price,
+    onChange: e => setForm({
+      ...form,
+      price: e.target.value
+    })
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "form-grid"
+  }, /*#__PURE__*/React.createElement("input", {
+    className: "finput",
+    placeholder: "Category",
+    value: form.category,
+    onChange: e => setForm({
+      ...form,
+      category: e.target.value
+    })
+  }), /*#__PURE__*/React.createElement("input", {
+    className: "finput",
+    placeholder: "Emoji (e.g. \uD83C\uDF5B)",
+    value: form.emoji,
+    onChange: e => setForm({
+      ...form,
+      emoji: e.target.value
+    })
+  })), /*#__PURE__*/React.createElement("button", {
+    className: "add-btn",
+    onClick: handleAdd,
+    disabled: !form.name.trim() || !form.price || !form.category.trim()
+  }, "Add to Menu")));
 }
-
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.createElement(App, null));
 </script>
 </body>
 </html>

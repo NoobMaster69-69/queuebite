@@ -4,9 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QueueBite — Order</title>
-<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -157,60 +156,116 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel">
-const {useState, useEffect} = React;
+<script>
+const {
+  useState,
+  useEffect
+} = React;
 const API = 'https://queuebite.pythonanywhere.com';
 const rid = new URLSearchParams(window.location.search).get('r');
-
-const get   = (path) => fetch(API+path).then(r=>r.json());
-const post  = (path, body) => fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}).then(r=>({ok:r.ok,data:r.json()})).then(async r=>({...r,data:await r.data}));
-const patch = (path, body) => fetch(API+path,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-
+const get = path => fetch(API + path).then(r => r.json());
+const post = (path, body) => fetch(API + path, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(body)
+}).then(r => ({
+  ok: r.ok,
+  data: r.json()
+})).then(async r => ({
+  ...r,
+  data: await r.data
+}));
+const patch = (path, body) => fetch(API + path, {
+  method: 'PATCH',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(body)
+});
 function fmt(iso) {
   if (!iso) return '—';
-  return new Date(iso).toLocaleString('en-IN',{hour:'numeric',minute:'2-digit',hour12:true,day:'numeric',month:'short',year:'numeric'});
+  return new Date(iso).toLocaleString('en-IN', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  });
 }
-
-const STATUS_STEPS = ['pending','accepted','preparing','ready','collected'];
-const STEP_LABELS  = ['Placed','Confirmed','Preparing','Ready','Collected'];
+const STATUS_STEPS = ['pending', 'accepted', 'preparing', 'ready', 'collected'];
+const STEP_LABELS = ['Placed', 'Confirmed', 'Preparing', 'Ready', 'Collected'];
 const STATUS_MSG = {
-  pending:          {text:'Waiting for kitchen to confirm…',           bg:'var(--amber-light)',color:'var(--amber)'},
-  accepted:         {text:'Order confirmed! Kitchen is on it.',        bg:'var(--green-light)',color:'var(--green)'},
-  preparing:        {text:'Being prepared right now!',                 bg:'var(--blue-light)', color:'var(--blue)'},
-  ready:            {text:'Ready to collect — head to the counter!',   bg:'var(--green-light)',color:'var(--green)'},
-  collected:        {text:'Collected. Enjoy your meal!',               bg:'#F1F1F1',           color:'#555'},
-  cancel_requested: {text:'Cancellation requested — awaiting vendor.', bg:'var(--amber-light)',color:'var(--amber)'},
+  pending: {
+    text: 'Waiting for kitchen to confirm…',
+    bg: 'var(--amber-light)',
+    color: 'var(--amber)'
+  },
+  accepted: {
+    text: 'Order confirmed! Kitchen is on it.',
+    bg: 'var(--green-light)',
+    color: 'var(--green)'
+  },
+  preparing: {
+    text: 'Being prepared right now!',
+    bg: 'var(--blue-light)',
+    color: 'var(--blue)'
+  },
+  ready: {
+    text: 'Ready to collect — head to the counter!',
+    bg: 'var(--green-light)',
+    color: 'var(--green)'
+  },
+  collected: {
+    text: 'Collected. Enjoy your meal!',
+    bg: '#F1F1F1',
+    color: '#555'
+  },
+  cancel_requested: {
+    text: 'Cancellation requested — awaiting vendor.',
+    bg: 'var(--amber-light)',
+    color: 'var(--amber)'
+  }
 };
-
 function BrandFooter() {
-  return (
-    <div className="brand-footer">
-      <div className="es-badge">Es</div>
-      QueueBite by EasyServe
-    </div>
-  );
+  return /*#__PURE__*/React.createElement("div", {
+    className: "brand-footer"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "es-badge"
+  }, "Es"), "QueueBite by EasyServe");
 }
 
 // ─── App ──────────────────────────────────────────────
 function App() {
-  const [screen, setScreen]       = useState('loading');
-  const [restInfo, setRestInfo]   = useState(null);
-  const [customer, setCustomer]   = useState(null);
+  const [screen, setScreen] = useState('loading');
+  const [restInfo, setRestInfo] = useState(null);
+  const [customer, setCustomer] = useState(null);
   const [tempPhone, setTempPhone] = useState('');
-  const [orders, setOrders]       = useState([]);
-  const [menu, setMenu]           = useState([]);
-  const [cart, setCart]           = useState({});
+  const [orders, setOrders] = useState([]);
+  const [menu, setMenu] = useState([]);
+  const [cart, setCart] = useState({});
   const [orderType, setOrderType] = useState('dine-in');
-  const [loading, setLoading]     = useState(false);
-  const [error, setError]         = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   // Load restaurant info first
   useEffect(() => {
-    if (!rid) { setScreen('no-id'); return; }
+    if (!rid) {
+      setScreen('no-id');
+      return;
+    }
     get(`/r/${rid}/info`).then(info => {
-      if (info.error) { setScreen('not-found'); return; }
+      if (info.error) {
+        setScreen('not-found');
+        return;
+      }
       setRestInfo(info);
-      if (!info.active)          { setScreen('inactive'); return; }
+      if (!info.active) {
+        setScreen('inactive');
+        return;
+      }
       setScreen('phone');
     }).catch(() => setScreen('error'));
   }, []);
@@ -230,9 +285,7 @@ function App() {
   useEffect(() => {
     if (!customer) return;
     const fetchOrders = () => {
-      get(`/r/${rid}/orders?phone=${encodeURIComponent(customer.phone)}`)
-        .then(d => setOrders(Array.isArray(d) ? d : []))
-        .catch(()=>{});
+      get(`/r/${rid}/orders?phone=${encodeURIComponent(customer.phone)}`).then(d => setOrders(Array.isArray(d) ? d : [])).catch(() => {});
     };
     fetchOrders();
     const t = setInterval(fetchOrders, 10000);
@@ -242,404 +295,812 @@ function App() {
   // Fetch live menu when on menu screen
   useEffect(() => {
     if (screen === 'menu') {
-      get(`/r/${rid}/menu`).then(d => setMenu(Array.isArray(d)?d:[]));
-      const t = setInterval(()=>get(`/r/${rid}/menu`).then(d=>setMenu(Array.isArray(d)?d:[])),10000);
+      get(`/r/${rid}/menu`).then(d => setMenu(Array.isArray(d) ? d : []));
+      const t = setInterval(() => get(`/r/${rid}/menu`).then(d => setMenu(Array.isArray(d) ? d : [])), 10000);
       return () => clearInterval(t);
     }
   }, [screen]);
-
-  const handlePhoneSubmit = async (phone) => {
-    setLoading(true); setError('');
+  const handlePhoneSubmit = async phone => {
+    setLoading(true);
+    setError('');
     try {
       const res = await get(`/customers/${encodeURIComponent(phone)}`);
-      if (res.error) { setTempPhone(phone); setScreen('register'); }
-      else           { setCustomer(res); setScreen('dashboard'); }
-    } catch(e) { setError('Cannot connect to server.'); }
+      if (res.error) {
+        setTempPhone(phone);
+        setScreen('register');
+      } else {
+        setCustomer(res);
+        setScreen('dashboard');
+      }
+    } catch (e) {
+      setError('Cannot connect to server.');
+    }
     setLoading(false);
   };
-
-  const handleRegister = async (name) => {
-    setLoading(true); setError('');
+  const handleRegister = async name => {
+    setLoading(true);
+    setError('');
     try {
-      const {data} = await post('/customers', {phone: tempPhone, name});
-      setCustomer(data); setScreen('dashboard');
-    } catch(e) { setError('Cannot connect to server.'); }
+      const {
+        data
+      } = await post('/customers', {
+        phone: tempPhone,
+        name
+      });
+      setCustomer(data);
+      setScreen('dashboard');
+    } catch (e) {
+      setError('Cannot connect to server.');
+    }
     setLoading(false);
   };
-
   const handlePlaceOrder = async () => {
     // Re-check accepting orders before placing
     const info = await get(`/r/${rid}/info`);
-    if (!info.acceptingOrders) { setError('Sorry, the kitchen is not taking orders right now.'); return; }
+    if (!info.acceptingOrders) {
+      setError('Sorry, the kitchen is not taking orders right now.');
+      return;
+    }
     const items = Object.entries(cart).map(([id, qty]) => {
       const item = menu.find(m => m.id === Number(id));
-      return {...item, qty};
+      return {
+        ...item,
+        qty
+      };
     });
-    const total = items.reduce((s,i) => s + i.price*i.qty, 0);
+    const total = items.reduce((s, i) => s + i.price * i.qty, 0);
     setLoading(true);
     try {
-      await post(`/r/${rid}/orders`, {phone: customer.phone, customerName: customer.name, items, total, orderType});
-      setCart({}); setScreen('dashboard');
-    } catch(e) { setError('Failed to place order.'); }
+      await post(`/r/${rid}/orders`, {
+        phone: customer.phone,
+        customerName: customer.name,
+        items,
+        total,
+        orderType
+      });
+      setCart({});
+      setScreen('dashboard');
+    } catch (e) {
+      setError('Failed to place order.');
+    }
     setLoading(false);
   };
-
-  const handleCancelOrder = async (orderId) => {
-    await patch(`/r/${rid}/orders/${orderId.replace('#','')}`, {status:'cancelled', cancelledBy:'customer', phone:customer.phone});
+  const handleCancelOrder = async orderId => {
+    await patch(`/r/${rid}/orders/${orderId.replace('#', '')}`, {
+      status: 'cancelled',
+      cancelledBy: 'customer',
+      phone: customer.phone
+    });
   };
-
   const handleRequestCancel = async (orderId, currentStatus) => {
-    await patch(`/r/${rid}/orders/${orderId.replace('#','')}`, {status:'cancel_requested', cancelRequestedFrom:currentStatus, cancelledBy:'customer', phone:customer.phone});
+    await patch(`/r/${rid}/orders/${orderId.replace('#', '')}`, {
+      status: 'cancel_requested',
+      cancelRequestedFrom: currentStatus,
+      cancelledBy: 'customer',
+      phone: customer.phone
+    });
   };
-
   const updateCart = (id, delta) => {
     setCart(prev => {
-      const n = {...prev, [id]: Math.max(0,(prev[id]||0)+delta)};
+      const n = {
+        ...prev,
+        [id]: Math.max(0, (prev[id] || 0) + delta)
+      };
       if (!n[id]) delete n[id];
       return n;
     });
   };
-
-  const cartCount = Object.values(cart).reduce((a,b)=>a+b,0);
-  const cartTotal = Object.entries(cart).reduce((s,[id,qty])=>{
-    const it = menu.find(m=>m.id===Number(id));
-    return s + (it ? it.price*qty : 0);
-  },0);
-
-  const activeOrders = orders.filter(o => !['collected','declined','cancelled'].includes(o.status));
-  const pastOrders   = orders.filter(o =>  ['collected','declined','cancelled'].includes(o.status));
+  const cartCount = Object.values(cart).reduce((a, b) => a + b, 0);
+  const cartTotal = Object.entries(cart).reduce((s, [id, qty]) => {
+    const it = menu.find(m => m.id === Number(id));
+    return s + (it ? it.price * qty : 0);
+  }, 0);
+  const activeOrders = orders.filter(o => !['collected', 'declined', 'cancelled'].includes(o.status));
+  const pastOrders = orders.filter(o => ['collected', 'declined', 'cancelled'].includes(o.status));
 
   // Full-screen states
-  if (screen === 'loading')   return <LoadingScreen/>;
-  if (screen === 'no-id')     return <FullScreen icon="🔗" title="No restaurant found" sub="This link doesn't include a restaurant ID. Please scan the QR code provided by the restaurant."/>;
-  if (screen === 'not-found') return <FullScreen icon="🚫" title="Restaurant not found" sub="This restaurant doesn't exist on QueueBite."/>;
-  if (screen === 'inactive')  return <FullScreen icon="🔒" title="This restaurant is closed" sub={`${restInfo?.name || 'This restaurant'} is no longer active on QueueBite.`} showBrand/>;
-  if (screen === 'error')     return <FullScreen icon="⚠️" title="Connection error" sub="Could not reach the server. Please try again."/>;
+  if (screen === 'loading') return /*#__PURE__*/React.createElement(LoadingScreen, null);
+  if (screen === 'no-id') return /*#__PURE__*/React.createElement(FullScreen, {
+    icon: "\uD83D\uDD17",
+    title: "No restaurant found",
+    sub: "This link doesn't include a restaurant ID. Please scan the QR code provided by the restaurant."
+  });
+  if (screen === 'not-found') return /*#__PURE__*/React.createElement(FullScreen, {
+    icon: "\uD83D\uDEAB",
+    title: "Restaurant not found",
+    sub: "This restaurant doesn't exist on QueueBite."
+  });
+  if (screen === 'inactive') return /*#__PURE__*/React.createElement(FullScreen, {
+    icon: "\uD83D\uDD12",
+    title: "This restaurant is closed",
+    sub: `${restInfo?.name || 'This restaurant'} is no longer active on QueueBite.`,
+    showBrand: true
+  });
+  if (screen === 'error') return /*#__PURE__*/React.createElement(FullScreen, {
+    icon: "\u26A0\uFE0F",
+    title: "Connection error",
+    sub: "Could not reach the server. Please try again."
+  });
 
   // Paused — but only show this on dashboard/menu, not during active ordering
   const isPaused = restInfo && !restInfo.acceptingOrders;
-
-  if (screen === 'phone')    return <PhoneScreen    restInfo={restInfo} onSubmit={handlePhoneSubmit} loading={loading} error={error}/>;
-  if (screen === 'register') return <RegisterScreen phone={tempPhone} onSubmit={handleRegister} loading={loading} error={error}/>;
+  if (screen === 'phone') return /*#__PURE__*/React.createElement(PhoneScreen, {
+    restInfo: restInfo,
+    onSubmit: handlePhoneSubmit,
+    loading: loading,
+    error: error
+  });
+  if (screen === 'register') return /*#__PURE__*/React.createElement(RegisterScreen, {
+    phone: tempPhone,
+    onSubmit: handleRegister,
+    loading: loading,
+    error: error
+  });
 
   // Dashboard — show paused screen if not accepting and no active orders
   if (screen === 'dashboard' && isPaused && activeOrders.length === 0) {
-    return <PausedScreen restInfo={restInfo} customer={customer} pastOrders={pastOrders}/>;
+    return /*#__PURE__*/React.createElement(PausedScreen, {
+      restInfo: restInfo,
+      customer: customer,
+      pastOrders: pastOrders
+    });
   }
-
-  if (screen === 'dashboard') return <Dashboard customer={customer} restInfo={restInfo} activeOrders={activeOrders} pastOrders={pastOrders} onNewOrder={()=>{ if(isPaused){alert('The kitchen is not taking orders right now.');return;} setScreen('menu');}} onCancelOrder={handleCancelOrder} onRequestCancel={handleRequestCancel}/>;
-  if (screen === 'menu')      return <MenuScreen  restInfo={restInfo} menu={menu} cart={cart} updateCart={updateCart} cartCount={cartCount} cartTotal={cartTotal} onViewCart={()=>setScreen('cart')} onBack={()=>setScreen('dashboard')}/>;
-  if (screen === 'cart')      return <CartScreen  restInfo={restInfo} menu={menu} cart={cart} updateCart={updateCart} cartTotal={cartTotal} orderType={orderType} setOrderType={setOrderType} onPlace={handlePlaceOrder} onBack={()=>setScreen('menu')} loading={loading} error={error}/>;
+  if (screen === 'dashboard') return /*#__PURE__*/React.createElement(Dashboard, {
+    customer: customer,
+    restInfo: restInfo,
+    activeOrders: activeOrders,
+    pastOrders: pastOrders,
+    onNewOrder: () => {
+      if (isPaused) {
+        alert('The kitchen is not taking orders right now.');
+        return;
+      }
+      setScreen('menu');
+    },
+    onCancelOrder: handleCancelOrder,
+    onRequestCancel: handleRequestCancel
+  });
+  if (screen === 'menu') return /*#__PURE__*/React.createElement(MenuScreen, {
+    restInfo: restInfo,
+    menu: menu,
+    cart: cart,
+    updateCart: updateCart,
+    cartCount: cartCount,
+    cartTotal: cartTotal,
+    onViewCart: () => setScreen('cart'),
+    onBack: () => setScreen('dashboard')
+  });
+  if (screen === 'cart') return /*#__PURE__*/React.createElement(CartScreen, {
+    restInfo: restInfo,
+    menu: menu,
+    cart: cart,
+    updateCart: updateCart,
+    cartTotal: cartTotal,
+    orderType: orderType,
+    setOrderType: setOrderType,
+    onPlace: handlePlaceOrder,
+    onBack: () => setScreen('menu'),
+    loading: loading,
+    error: error
+  });
 }
 
 // ── Full screen states ────────────────────────────────
 function LoadingScreen() {
-  return <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'100vh',color:'var(--muted)'}}>Loading…</div>;
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100vh',
+      color: 'var(--muted)'
+    }
+  }, "Loading\u2026");
 }
-
-function FullScreen({icon, title, sub, showBrand}) {
-  return (
-    <div className="full-screen">
-      <div className="full-icon">{icon}</div>
-      <h1 className="full-title">{title}</h1>
-      <p className="full-sub">{sub}</p>
-      {showBrand && <div style={{marginTop:32}}><BrandFooter/></div>}
-    </div>
-  );
+function FullScreen({
+  icon,
+  title,
+  sub,
+  showBrand
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "full-screen"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "full-icon"
+  }, icon), /*#__PURE__*/React.createElement("h1", {
+    className: "full-title"
+  }, title), /*#__PURE__*/React.createElement("p", {
+    className: "full-sub"
+  }, sub), showBrand && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 32
+    }
+  }, /*#__PURE__*/React.createElement(BrandFooter, null)));
 }
-
-function PausedScreen({restInfo, customer, pastOrders}) {
-  return (
-    <div>
-      <div className="topbar">
-        <div className="topbar-inner">
-          <div className="topbar-left">
-            {restInfo?.logoUrl && <div className="rest-logo"><img src={`https://queuebite.pythonanywhere.com${restInfo.logoUrl}`} alt="logo"/></div>}
-            <span className="topbar-name">{restInfo?.name}</span>
-          </div>
-          <span className="topbar-user">Hey, {customer?.name} 👋</span>
-        </div>
-      </div>
-      <div className="full-screen" style={{minHeight:'60vh'}}>
-        <div className="full-icon">⏸️</div>
-        <h1 className="full-title">Not taking orders right now</h1>
-        <p className="full-sub">The kitchen is currently closed. Please check back later.</p>
-      </div>
-      {pastOrders.length > 0 && (
-        <div className="wrap" style={{paddingBottom:40}}>
-          <div className="section-label">Order History</div>
-          {pastOrders.map(o=><PastOrderCard key={o.id} order={o}/>)}
-        </div>
-      )}
-      <BrandFooter/>
-    </div>
-  );
+function PausedScreen({
+  restInfo,
+  customer,
+  pastOrders
+}) {
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "topbar"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "topbar-inner"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "topbar-left"
+  }, restInfo?.logoUrl && /*#__PURE__*/React.createElement("div", {
+    className: "rest-logo"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: `https://queuebite.pythonanywhere.com${restInfo.logoUrl}`,
+    alt: "logo"
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "topbar-name"
+  }, restInfo?.name)), /*#__PURE__*/React.createElement("span", {
+    className: "topbar-user"
+  }, "Hey, ", customer?.name, " \uD83D\uDC4B"))), /*#__PURE__*/React.createElement("div", {
+    className: "full-screen",
+    style: {
+      minHeight: '60vh'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "full-icon"
+  }, "\u23F8\uFE0F"), /*#__PURE__*/React.createElement("h1", {
+    className: "full-title"
+  }, "Not taking orders right now"), /*#__PURE__*/React.createElement("p", {
+    className: "full-sub"
+  }, "The kitchen is currently closed. Please check back later.")), pastOrders.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "wrap",
+    style: {
+      paddingBottom: 40
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-label"
+  }, "Order History"), pastOrders.map(o => /*#__PURE__*/React.createElement(PastOrderCard, {
+    key: o.id,
+    order: o
+  }))), /*#__PURE__*/React.createElement(BrandFooter, null));
 }
 
 // ── Phone screen ──────────────────────────────────────
-function PhoneScreen({restInfo, onSubmit, loading, error}) {
+function PhoneScreen({
+  restInfo,
+  onSubmit,
+  loading,
+  error
+}) {
   const [phone, setPhone] = useState('');
   const valid = /^[6-9]\d{9}$/.test(phone);
-  return (
-    <div>
-      <div className="center-screen">
-        <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:8}}>
-          {restInfo?.logoUrl && <div className="rest-logo" style={{width:48,height:48,borderRadius:12}}><img src={`https://queuebite.pythonanywhere.com${restInfo.logoUrl}`} alt="logo"/></div>}
-          <div className="screen-logo" style={{marginBottom:0}}>{restInfo?.name || 'QueueBite'}</div>
-        </div>
-        <p className="screen-sub">Quick food ordering</p>
-        <h2 className="screen-title">Enter your phone number</h2>
-        <p className="screen-hint">We'll use this to track your orders<br/>and remember you next time.</p>
-        <input className="field" type="tel" maxLength={10} placeholder="10-digit mobile number"
-          value={phone} onChange={e=>setPhone(e.target.value.replace(/\D/g,''))}
-          onKeyDown={e=>e.key==='Enter'&&valid&&!loading&&onSubmit(phone)} autoFocus/>
-        <button className="btn-primary" disabled={!valid||loading} onClick={()=>onSubmit(phone)}>
-          {loading ? 'Checking…' : 'Continue →'}
-        </button>
-        {error && <p className="error-msg">{error}</p>}
-      </div>
-      <BrandFooter/>
-    </div>
-  );
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "center-screen"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 12,
+      marginBottom: 8
+    }
+  }, restInfo?.logoUrl && /*#__PURE__*/React.createElement("div", {
+    className: "rest-logo",
+    style: {
+      width: 48,
+      height: 48,
+      borderRadius: 12
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: `https://queuebite.pythonanywhere.com${restInfo.logoUrl}`,
+    alt: "logo"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "screen-logo",
+    style: {
+      marginBottom: 0
+    }
+  }, restInfo?.name || 'QueueBite')), /*#__PURE__*/React.createElement("p", {
+    className: "screen-sub"
+  }, "Quick food ordering"), /*#__PURE__*/React.createElement("h2", {
+    className: "screen-title"
+  }, "Enter your phone number"), /*#__PURE__*/React.createElement("p", {
+    className: "screen-hint"
+  }, "We'll use this to track your orders", /*#__PURE__*/React.createElement("br", null), "and remember you next time."), /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    type: "tel",
+    maxLength: 10,
+    placeholder: "10-digit mobile number",
+    value: phone,
+    onChange: e => setPhone(e.target.value.replace(/\D/g, '')),
+    onKeyDown: e => e.key === 'Enter' && valid && !loading && onSubmit(phone),
+    autoFocus: true
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn-primary",
+    disabled: !valid || loading,
+    onClick: () => onSubmit(phone)
+  }, loading ? 'Checking…' : 'Continue →'), error && /*#__PURE__*/React.createElement("p", {
+    className: "error-msg"
+  }, error)), /*#__PURE__*/React.createElement(BrandFooter, null));
 }
 
 // ── Register screen ───────────────────────────────────
-function RegisterScreen({phone, onSubmit, loading, error}) {
+function RegisterScreen({
+  phone,
+  onSubmit,
+  loading,
+  error
+}) {
   const [name, setName] = useState('');
-  return (
-    <div>
-      <div className="center-screen">
-        <div className="screen-logo">Queue<em>Bite</em></div>
-        <p className="screen-sub" style={{marginBottom:8}}>New here! 👋</p>
-        <p className="screen-hint" style={{marginBottom:8,color:'var(--muted)'}}>+91 {phone}</p>
-        <h2 className="screen-title">What's your name?</h2>
-        <p className="screen-hint">So the kitchen knows who to call.</p>
-        <input className="field" placeholder="Your name" value={name} onChange={e=>setName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&name.trim()&&!loading&&onSubmit(name.trim())} autoFocus/>
-        <button className="btn-primary" disabled={!name.trim()||loading} onClick={()=>onSubmit(name.trim())}>
-          {loading ? 'Saving…' : 'Start Ordering →'}
-        </button>
-        {error && <p className="error-msg">{error}</p>}
-      </div>
-      <BrandFooter/>
-    </div>
-  );
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "center-screen"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "screen-logo"
+  }, "Queue", /*#__PURE__*/React.createElement("em", null, "Bite")), /*#__PURE__*/React.createElement("p", {
+    className: "screen-sub",
+    style: {
+      marginBottom: 8
+    }
+  }, "New here! \uD83D\uDC4B"), /*#__PURE__*/React.createElement("p", {
+    className: "screen-hint",
+    style: {
+      marginBottom: 8,
+      color: 'var(--muted)'
+    }
+  }, "+91 ", phone), /*#__PURE__*/React.createElement("h2", {
+    className: "screen-title"
+  }, "What's your name?"), /*#__PURE__*/React.createElement("p", {
+    className: "screen-hint"
+  }, "So the kitchen knows who to call."), /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    placeholder: "Your name",
+    value: name,
+    onChange: e => setName(e.target.value),
+    onKeyDown: e => e.key === 'Enter' && name.trim() && !loading && onSubmit(name.trim()),
+    autoFocus: true
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn-primary",
+    disabled: !name.trim() || loading,
+    onClick: () => onSubmit(name.trim())
+  }, loading ? 'Saving…' : 'Start Ordering →'), error && /*#__PURE__*/React.createElement("p", {
+    className: "error-msg"
+  }, error)), /*#__PURE__*/React.createElement(BrandFooter, null));
 }
 
 // ── Dashboard ─────────────────────────────────────────
-function Dashboard({customer, restInfo, activeOrders, pastOrders, onNewOrder, onCancelOrder, onRequestCancel}) {
-  return (
-    <div>
-      <div className="topbar">
-        <div className="topbar-inner">
-          <div className="topbar-left">
-            {restInfo?.logoUrl && <div className="rest-logo"><img src={`https://queuebite.pythonanywhere.com${restInfo.logoUrl}`} alt="logo"/></div>}
-            <span className="topbar-name">{restInfo?.name}</span>
-          </div>
-          <span className="topbar-user">Hey, {customer.name} 👋</span>
-        </div>
-      </div>
-      <div className="wrap page">
-        <button className="new-order-btn" onClick={onNewOrder}>+ Place New Order</button>
-        {activeOrders.length > 0 && (
-          <>
-            <div className="section-label">Live Order{activeOrders.length>1?'s':''}</div>
-            {activeOrders.map(o=><ActiveOrderCard key={o.id} order={o} onCancelOrder={onCancelOrder} onRequestCancel={onRequestCancel}/>)}
-          </>
-        )}
-        <div className="section-label" style={{marginTop:activeOrders.length?28:0}}>
-          Order History {pastOrders.length>0&&`(${pastOrders.length})`}
-        </div>
-        {pastOrders.length === 0
-          ? <div className="empty-state"><div className="empty-icon">🍽️</div><p>No past orders yet.<br/>Place your first order above!</p></div>
-          : pastOrders.map(o=><PastOrderCard key={o.id} order={o}/>)
-        }
-      </div>
-      <BrandFooter/>
-    </div>
-  );
+function Dashboard({
+  customer,
+  restInfo,
+  activeOrders,
+  pastOrders,
+  onNewOrder,
+  onCancelOrder,
+  onRequestCancel
+}) {
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "topbar"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "topbar-inner"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "topbar-left"
+  }, restInfo?.logoUrl && /*#__PURE__*/React.createElement("div", {
+    className: "rest-logo"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: `https://queuebite.pythonanywhere.com${restInfo.logoUrl}`,
+    alt: "logo"
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "topbar-name"
+  }, restInfo?.name)), /*#__PURE__*/React.createElement("span", {
+    className: "topbar-user"
+  }, "Hey, ", customer.name, " \uD83D\uDC4B"))), /*#__PURE__*/React.createElement("div", {
+    className: "wrap page"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "new-order-btn",
+    onClick: onNewOrder
+  }, "+ Place New Order"), activeOrders.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "section-label"
+  }, "Live Order", activeOrders.length > 1 ? 's' : ''), activeOrders.map(o => /*#__PURE__*/React.createElement(ActiveOrderCard, {
+    key: o.id,
+    order: o,
+    onCancelOrder: onCancelOrder,
+    onRequestCancel: onRequestCancel
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "section-label",
+    style: {
+      marginTop: activeOrders.length ? 28 : 0
+    }
+  }, "Order History ", pastOrders.length > 0 && `(${pastOrders.length})`), pastOrders.length === 0 ? /*#__PURE__*/React.createElement("div", {
+    className: "empty-state"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "empty-icon"
+  }, "\uD83C\uDF7D\uFE0F"), /*#__PURE__*/React.createElement("p", null, "No past orders yet.", /*#__PURE__*/React.createElement("br", null), "Place your first order above!")) : pastOrders.map(o => /*#__PURE__*/React.createElement(PastOrderCard, {
+    key: o.id,
+    order: o
+  }))), /*#__PURE__*/React.createElement(BrandFooter, null));
 }
 
 // ── Active order card ─────────────────────────────────
-function ActiveOrderCard({order, onCancelOrder, onRequestCancel}) {
+function ActiveOrderCard({
+  order,
+  onCancelOrder,
+  onRequestCancel
+}) {
   const [showConfirm, setShowConfirm] = useState(false);
-
   if (order.status === 'declined') {
-    return (
-      <div className="declined-card">
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',marginBottom:8}}>
-          <div><span style={{fontWeight:700,fontSize:15}}>{order.id}</span><div style={{fontSize:13,color:'var(--red)',marginTop:2}}>Order was declined</div></div>
-          <span style={{fontSize:11,fontWeight:700,background:'var(--red)',color:'#fff',padding:'4px 10px',borderRadius:20}}>Declined</span>
-        </div>
-        <div style={{fontSize:13,color:'var(--muted)'}}>{order.items.map((i,idx)=><span key={idx}>{i.qty}× {i.name}{idx<order.items.length-1?', ':''}</span>)}</div>
-        <div style={{fontSize:12,color:'var(--muted)',marginTop:8}}>Please speak to the counter for assistance.</div>
-      </div>
-    );
+    return /*#__PURE__*/React.createElement("div", {
+      className: "declined-card"
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: 8
+      }
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontWeight: 700,
+        fontSize: 15
+      }
+    }, order.id), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 13,
+        color: 'var(--red)',
+        marginTop: 2
+      }
+    }, "Order was declined")), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 11,
+        fontWeight: 700,
+        background: 'var(--red)',
+        color: '#fff',
+        padding: '4px 10px',
+        borderRadius: 20
+      }
+    }, "Declined")), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 13,
+        color: 'var(--muted)'
+      }
+    }, order.items.map((i, idx) => /*#__PURE__*/React.createElement("span", {
+      key: idx
+    }, i.qty, "\xD7 ", i.name, idx < order.items.length - 1 ? ', ' : ''))), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 12,
+        color: 'var(--muted)',
+        marginTop: 8
+      }
+    }, "Please speak to the counter for assistance."));
   }
-
-  const isPreCooking = ['pending','accepted'].includes(order.status);
-  const isCancelReq  = order.status === 'cancel_requested';
-  const stepIdx      = STATUS_STEPS.indexOf(order.status);
-  const msg          = STATUS_MSG[order.status] || STATUS_MSG.pending;
-
-  return (
-    <div className="active-card" style={{marginBottom:14}}>
-      <div className="active-card-header">
-        <div>
-          <span className="order-id">{order.id}</span>
-          <div className="order-meta">{order.orderType==='dine-in'?'Dine In':'Takeaway'} · ₹{order.total} · {fmt(order.placedTs)}</div>
-        </div>
-        <span className={`order-type-pill ${order.orderType==='dine-in'?'pill-dine':'pill-take'}`}>{order.orderType==='dine-in'?'Dine In':'Takeaway'}</span>
-      </div>
-      {!isCancelReq && (
-        <div className="status-track">
-          <div className="status-steps">
-            {STATUS_STEPS.map((s,i)=>(
-              <React.Fragment key={s}>
-                <div className={`step-dot ${i<stepIdx?'done':''} ${i===stepIdx?'active':''}`}/>
-                {i<STATUS_STEPS.length-1 && <div className={`step-line ${i<stepIdx?'done':''}`}/>}
-              </React.Fragment>
-            ))}
-          </div>
-          <div className="status-steps" style={{marginTop:6}}>
-            {STEP_LABELS.map((l,i)=>(
-              <React.Fragment key={i}>
-                <span style={{fontSize:9,color:i===stepIdx?'var(--accent)':i<stepIdx?'var(--green)':'var(--muted)',fontWeight:i===stepIdx?600:400,width:16,textAlign:'center',flexShrink:0}}>{l}</span>
-                {i<STEP_LABELS.length-1&&<div style={{flex:1}}/>}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-      )}
-      <div className="status-message" style={{background:msg.bg,color:msg.color}}>{msg.text}</div>
-      <div className="order-items-preview" style={{marginTop:10}}>
-        {order.items.map((it,i)=><span key={i}>{it.qty}× {it.name}{i<order.items.length-1?', ':''}</span>)}
-      </div>
-      {!showConfirm && !isCancelReq && (
-        <button className="cancel-link" onClick={()=>setShowConfirm(true)}>
-          {isPreCooking ? 'Cancel order' : 'Request cancellation'}
-        </button>
-      )}
-      {showConfirm && (
-        <div className="confirm-box">
-          <p>{isPreCooking ? 'Cancel this order?' : 'Request cancellation? The vendor will need to approve.'}</p>
-          <div className="confirm-btns">
-            <button className="confirm-yes" onClick={()=>{ if(isPreCooking) onCancelOrder(order.id); else onRequestCancel(order.id,order.status); setShowConfirm(false); }}>
-              {isPreCooking ? 'Yes, cancel' : 'Yes, request'}
-            </button>
-            <button className="confirm-no" onClick={()=>setShowConfirm(false)}>Keep order</button>
-          </div>
-        </div>
-      )}
-      {isCancelReq && <div className="cancel-req-msg">⏳ Cancellation requested — waiting for vendor to respond.</div>}
-    </div>
-  );
+  const isPreCooking = ['pending', 'accepted'].includes(order.status);
+  const isCancelReq = order.status === 'cancel_requested';
+  const stepIdx = STATUS_STEPS.indexOf(order.status);
+  const msg = STATUS_MSG[order.status] || STATUS_MSG.pending;
+  return /*#__PURE__*/React.createElement("div", {
+    className: "active-card",
+    style: {
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "active-card-header"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "order-id"
+  }, order.id), /*#__PURE__*/React.createElement("div", {
+    className: "order-meta"
+  }, order.orderType === 'dine-in' ? 'Dine In' : 'Takeaway', " \xB7 \u20B9", order.total, " \xB7 ", fmt(order.placedTs))), /*#__PURE__*/React.createElement("span", {
+    className: `order-type-pill ${order.orderType === 'dine-in' ? 'pill-dine' : 'pill-take'}`
+  }, order.orderType === 'dine-in' ? 'Dine In' : 'Takeaway')), !isCancelReq && /*#__PURE__*/React.createElement("div", {
+    className: "status-track"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "status-steps"
+  }, STATUS_STEPS.map((s, i) => /*#__PURE__*/React.createElement(React.Fragment, {
+    key: s
+  }, /*#__PURE__*/React.createElement("div", {
+    className: `step-dot ${i < stepIdx ? 'done' : ''} ${i === stepIdx ? 'active' : ''}`
+  }), i < STATUS_STEPS.length - 1 && /*#__PURE__*/React.createElement("div", {
+    className: `step-line ${i < stepIdx ? 'done' : ''}`
+  })))), /*#__PURE__*/React.createElement("div", {
+    className: "status-steps",
+    style: {
+      marginTop: 6
+    }
+  }, STEP_LABELS.map((l, i) => /*#__PURE__*/React.createElement(React.Fragment, {
+    key: i
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 9,
+      color: i === stepIdx ? 'var(--accent)' : i < stepIdx ? 'var(--green)' : 'var(--muted)',
+      fontWeight: i === stepIdx ? 600 : 400,
+      width: 16,
+      textAlign: 'center',
+      flexShrink: 0
+    }
+  }, l), i < STEP_LABELS.length - 1 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1
+    }
+  }))))), /*#__PURE__*/React.createElement("div", {
+    className: "status-message",
+    style: {
+      background: msg.bg,
+      color: msg.color
+    }
+  }, msg.text), /*#__PURE__*/React.createElement("div", {
+    className: "order-items-preview",
+    style: {
+      marginTop: 10
+    }
+  }, order.items.map((it, i) => /*#__PURE__*/React.createElement("span", {
+    key: i
+  }, it.qty, "\xD7 ", it.name, i < order.items.length - 1 ? ', ' : ''))), !showConfirm && !isCancelReq && /*#__PURE__*/React.createElement("button", {
+    className: "cancel-link",
+    onClick: () => setShowConfirm(true)
+  }, isPreCooking ? 'Cancel order' : 'Request cancellation'), showConfirm && /*#__PURE__*/React.createElement("div", {
+    className: "confirm-box"
+  }, /*#__PURE__*/React.createElement("p", null, isPreCooking ? 'Cancel this order?' : 'Request cancellation? The vendor will need to approve.'), /*#__PURE__*/React.createElement("div", {
+    className: "confirm-btns"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "confirm-yes",
+    onClick: () => {
+      if (isPreCooking) onCancelOrder(order.id);else onRequestCancel(order.id, order.status);
+      setShowConfirm(false);
+    }
+  }, isPreCooking ? 'Yes, cancel' : 'Yes, request'), /*#__PURE__*/React.createElement("button", {
+    className: "confirm-no",
+    onClick: () => setShowConfirm(false)
+  }, "Keep order"))), isCancelReq && /*#__PURE__*/React.createElement("div", {
+    className: "cancel-req-msg"
+  }, "\u23F3 Cancellation requested \u2014 waiting for vendor to respond."));
 }
 
 // ── Past order card ───────────────────────────────────
-function PastOrderCard({order}) {
-  const statusMap = {collected:{cls:'s-collected',label:'Collected'},declined:{cls:'s-declined',label:'Declined'},cancelled:{cls:'s-cancelled',label:'Cancelled'}};
-  const s = statusMap[order.status] || {cls:'s-declined',label:order.status};
-  return (
-    <div className="past-order">
-      <div className="past-order-header">
-        <div><span className="past-id">{order.id}</span><span style={{fontSize:12,color:'var(--muted)',marginLeft:8}}>{order.orderType==='dine-in'?'Dine In':'Takeaway'}</span></div>
-        <span className={`past-status ${s.cls}`}>{s.label}</span>
-      </div>
-      <div className="past-items">{order.items.map((it,i)=><span key={i}>{it.qty}× {it.name}{i<order.items.length-1?', ':''}</span>)}{' · '}<strong style={{color:'var(--dark)'}}>₹{order.total}</strong></div>
-      <div className="past-times">
-        <div className="time-row">Placed: <strong>{fmt(order.placedTs)}</strong></div>
-        {order.collectedTs && <div className="time-row">Collected: <strong>{fmt(order.collectedTs)}</strong></div>}
-        {order.cancelledTs && <div className="time-row">Cancelled: <strong>{fmt(order.cancelledTs)}</strong></div>}
-      </div>
-    </div>
-  );
+function PastOrderCard({
+  order
+}) {
+  const statusMap = {
+    collected: {
+      cls: 's-collected',
+      label: 'Collected'
+    },
+    declined: {
+      cls: 's-declined',
+      label: 'Declined'
+    },
+    cancelled: {
+      cls: 's-cancelled',
+      label: 'Cancelled'
+    }
+  };
+  const s = statusMap[order.status] || {
+    cls: 's-declined',
+    label: order.status
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    className: "past-order"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "past-order-header"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    className: "past-id"
+  }, order.id), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 12,
+      color: 'var(--muted)',
+      marginLeft: 8
+    }
+  }, order.orderType === 'dine-in' ? 'Dine In' : 'Takeaway')), /*#__PURE__*/React.createElement("span", {
+    className: `past-status ${s.cls}`
+  }, s.label)), /*#__PURE__*/React.createElement("div", {
+    className: "past-items"
+  }, order.items.map((it, i) => /*#__PURE__*/React.createElement("span", {
+    key: i
+  }, it.qty, "\xD7 ", it.name, i < order.items.length - 1 ? ', ' : '')), ' · ', /*#__PURE__*/React.createElement("strong", {
+    style: {
+      color: 'var(--dark)'
+    }
+  }, "\u20B9", order.total)), /*#__PURE__*/React.createElement("div", {
+    className: "past-times"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "time-row"
+  }, "Placed: ", /*#__PURE__*/React.createElement("strong", null, fmt(order.placedTs))), order.collectedTs && /*#__PURE__*/React.createElement("div", {
+    className: "time-row"
+  }, "Collected: ", /*#__PURE__*/React.createElement("strong", null, fmt(order.collectedTs))), order.cancelledTs && /*#__PURE__*/React.createElement("div", {
+    className: "time-row"
+  }, "Cancelled: ", /*#__PURE__*/React.createElement("strong", null, fmt(order.cancelledTs)))));
 }
 
 // ── Menu screen ───────────────────────────────────────
-function MenuScreen({restInfo, menu, cart, updateCart, cartCount, cartTotal, onViewCart, onBack}) {
-  const byCategory = menu.reduce((acc,item)=>{ acc[item.category]=acc[item.category]||[]; acc[item.category].push(item); return acc; },{});
-  return (
-    <div>
-      <div className="topbar">
-        <div className="topbar-inner">
-          <div className="topbar-left">
-            {restInfo?.logoUrl && <div className="rest-logo"><img src={`https://queuebite.pythonanywhere.com${restInfo.logoUrl}`} alt="logo"/></div>}
-            <span className="topbar-name">Menu</span>
-          </div>
-          <button className="back-btn" onClick={onBack}>← Back</button>
-        </div>
-      </div>
-      <div className="wrap page">
-        {Object.entries(byCategory).map(([cat,items])=>(
-          <div key={cat}>
-            <h2 className="category-title">{cat}</h2>
-            {items.map(item=>(
-              <div key={item.id} className={`menu-item${!item.available?' off':''}`}>
-                <span className="item-emoji">{item.emoji}</span>
-                <div className="item-info"><div className="item-name">{item.name}</div><div className="item-price">₹{item.price}</div>{!item.available&&<div className="unavail-tag">Not available</div>}</div>
-                {item.available && (cart[item.id]>0
-                  ? <div className="qty-ctrl"><button className="qbtn minus" onClick={()=>updateCart(item.id,-1)}>−</button><span className="qnum">{cart[item.id]}</span><button className="qbtn plus" onClick={()=>updateCart(item.id,1)}>+</button></div>
-                  : <button className="add-btn" onClick={()=>updateCart(item.id,1)}>Add</button>
-                )}
-              </div>
-            ))}
-          </div>
-        ))}
-        {menu.length===0&&<div className="empty-state"><div className="empty-icon">⏳</div><p>Loading menu…</p></div>}
-      </div>
-      {cartCount>0&&<div className="cart-bar"><div className="cart-bar-inner"><div className="cart-bar-info"><div className="lbl">{cartCount} item{cartCount!==1?'s':''}</div><div className="amt">₹{cartTotal}</div></div><button className="cart-bar-btn" onClick={onViewCart}>View Cart →</button></div></div>}
-    </div>
-  );
+function MenuScreen({
+  restInfo,
+  menu,
+  cart,
+  updateCart,
+  cartCount,
+  cartTotal,
+  onViewCart,
+  onBack
+}) {
+  const byCategory = menu.reduce((acc, item) => {
+    acc[item.category] = acc[item.category] || [];
+    acc[item.category].push(item);
+    return acc;
+  }, {});
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "topbar"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "topbar-inner"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "topbar-left"
+  }, restInfo?.logoUrl && /*#__PURE__*/React.createElement("div", {
+    className: "rest-logo"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: `https://queuebite.pythonanywhere.com${restInfo.logoUrl}`,
+    alt: "logo"
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "topbar-name"
+  }, "Menu")), /*#__PURE__*/React.createElement("button", {
+    className: "back-btn",
+    onClick: onBack
+  }, "\u2190 Back"))), /*#__PURE__*/React.createElement("div", {
+    className: "wrap page"
+  }, Object.entries(byCategory).map(([cat, items]) => /*#__PURE__*/React.createElement("div", {
+    key: cat
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "category-title"
+  }, cat), items.map(item => /*#__PURE__*/React.createElement("div", {
+    key: item.id,
+    className: `menu-item${!item.available ? ' off' : ''}`
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "item-emoji"
+  }, item.emoji), /*#__PURE__*/React.createElement("div", {
+    className: "item-info"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "item-name"
+  }, item.name), /*#__PURE__*/React.createElement("div", {
+    className: "item-price"
+  }, "\u20B9", item.price), !item.available && /*#__PURE__*/React.createElement("div", {
+    className: "unavail-tag"
+  }, "Not available")), item.available && (cart[item.id] > 0 ? /*#__PURE__*/React.createElement("div", {
+    className: "qty-ctrl"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "qbtn minus",
+    onClick: () => updateCart(item.id, -1)
+  }, "\u2212"), /*#__PURE__*/React.createElement("span", {
+    className: "qnum"
+  }, cart[item.id]), /*#__PURE__*/React.createElement("button", {
+    className: "qbtn plus",
+    onClick: () => updateCart(item.id, 1)
+  }, "+")) : /*#__PURE__*/React.createElement("button", {
+    className: "add-btn",
+    onClick: () => updateCart(item.id, 1)
+  }, "Add")))))), menu.length === 0 && /*#__PURE__*/React.createElement("div", {
+    className: "empty-state"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "empty-icon"
+  }, "\u23F3"), /*#__PURE__*/React.createElement("p", null, "Loading menu\u2026"))), cartCount > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "cart-bar"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "cart-bar-inner"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "cart-bar-info"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "lbl"
+  }, cartCount, " item", cartCount !== 1 ? 's' : ''), /*#__PURE__*/React.createElement("div", {
+    className: "amt"
+  }, "\u20B9", cartTotal)), /*#__PURE__*/React.createElement("button", {
+    className: "cart-bar-btn",
+    onClick: onViewCart
+  }, "View Cart \u2192"))));
 }
 
 // ── Cart screen ───────────────────────────────────────
-function CartScreen({restInfo, menu, cart, updateCart, cartTotal, orderType, setOrderType, onPlace, onBack, loading, error}) {
-  return (
-    <div>
-      <div className="topbar">
-        <div className="topbar-inner">
-          <div className="topbar-left">
-            {restInfo?.logoUrl&&<div className="rest-logo"><img src={`https://queuebite.pythonanywhere.com${restInfo.logoUrl}`} alt="logo"/></div>}
-            <span className="topbar-name">Your Cart</span>
-          </div>
-          <button className="back-btn" onClick={onBack}>← Menu</button>
-        </div>
-      </div>
-      <div className="wrap page">
-        <div className="card">
-          <div className="section-label">Order Summary</div>
-          {Object.entries(cart).map(([id,qty])=>{
-            const item=menu.find(m=>m.id===Number(id)); if(!item) return null;
-            return (<div className="cart-row" key={id}>
-              <span style={{fontSize:20}}>{item.emoji}</span>
-              <div className="qty-ctrl" style={{gap:6}}>
-                <button className="qbtn minus" style={{width:26,height:26,fontSize:16}} onClick={()=>updateCart(item.id,-1)}>−</button>
-                <span className="qnum" style={{fontSize:13}}>{qty}</span>
-                <button className="qbtn plus" style={{width:26,height:26,fontSize:16}} onClick={()=>updateCart(item.id,1)}>+</button>
-              </div>
-              <span className="cart-name">{item.name}</span>
-              <span className="cart-sub">₹{item.price*qty}</span>
-            </div>);
-          })}
-          <div className="total-row"><span>Total</span><span>₹{cartTotal}</span></div>
-        </div>
-        <div className="card">
-          <div className="section-label">How will you have it?</div>
-          <div className="type-grid">
-            <button className={`type-btn${orderType==='dine-in'?' active':''}`} onClick={()=>setOrderType('dine-in')}><em>🍽️</em><span>Dine In</span><span style={{fontSize:11,opacity:.7}}>Eat here</span></button>
-            <button className={`type-btn${orderType==='takeaway'?' active':''}`} onClick={()=>setOrderType('takeaway')}><em>🛍️</em><span>Takeaway</span><span style={{fontSize:11,opacity:.7}}>Pack to go</span></button>
-          </div>
-        </div>
-        {error&&<p style={{color:'var(--red)',fontSize:13,textAlign:'center'}}>{error}</p>}
-        <button className="place-btn" onClick={onPlace} disabled={loading}>{loading?'Placing Order…':`Place Order · ₹${cartTotal}`}</button>
-        <p className="counter-note">Pay at the counter when your order is ready.</p>
-      </div>
-      <BrandFooter/>
-    </div>
-  );
+function CartScreen({
+  restInfo,
+  menu,
+  cart,
+  updateCart,
+  cartTotal,
+  orderType,
+  setOrderType,
+  onPlace,
+  onBack,
+  loading,
+  error
+}) {
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "topbar"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "topbar-inner"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "topbar-left"
+  }, restInfo?.logoUrl && /*#__PURE__*/React.createElement("div", {
+    className: "rest-logo"
+  }, /*#__PURE__*/React.createElement("img", {
+    src: `https://queuebite.pythonanywhere.com${restInfo.logoUrl}`,
+    alt: "logo"
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "topbar-name"
+  }, "Your Cart")), /*#__PURE__*/React.createElement("button", {
+    className: "back-btn",
+    onClick: onBack
+  }, "\u2190 Menu"))), /*#__PURE__*/React.createElement("div", {
+    className: "wrap page"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-label"
+  }, "Order Summary"), Object.entries(cart).map(([id, qty]) => {
+    const item = menu.find(m => m.id === Number(id));
+    if (!item) return null;
+    return /*#__PURE__*/React.createElement("div", {
+      className: "cart-row",
+      key: id
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 20
+      }
+    }, item.emoji), /*#__PURE__*/React.createElement("div", {
+      className: "qty-ctrl",
+      style: {
+        gap: 6
+      }
+    }, /*#__PURE__*/React.createElement("button", {
+      className: "qbtn minus",
+      style: {
+        width: 26,
+        height: 26,
+        fontSize: 16
+      },
+      onClick: () => updateCart(item.id, -1)
+    }, "\u2212"), /*#__PURE__*/React.createElement("span", {
+      className: "qnum",
+      style: {
+        fontSize: 13
+      }
+    }, qty), /*#__PURE__*/React.createElement("button", {
+      className: "qbtn plus",
+      style: {
+        width: 26,
+        height: 26,
+        fontSize: 16
+      },
+      onClick: () => updateCart(item.id, 1)
+    }, "+")), /*#__PURE__*/React.createElement("span", {
+      className: "cart-name"
+    }, item.name), /*#__PURE__*/React.createElement("span", {
+      className: "cart-sub"
+    }, "\u20B9", item.price * qty));
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "total-row"
+  }, /*#__PURE__*/React.createElement("span", null, "Total"), /*#__PURE__*/React.createElement("span", null, "\u20B9", cartTotal))), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-label"
+  }, "How will you have it?"), /*#__PURE__*/React.createElement("div", {
+    className: "type-grid"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: `type-btn${orderType === 'dine-in' ? ' active' : ''}`,
+    onClick: () => setOrderType('dine-in')
+  }, /*#__PURE__*/React.createElement("em", null, "\uD83C\uDF7D\uFE0F"), /*#__PURE__*/React.createElement("span", null, "Dine In"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 11,
+      opacity: .7
+    }
+  }, "Eat here")), /*#__PURE__*/React.createElement("button", {
+    className: `type-btn${orderType === 'takeaway' ? ' active' : ''}`,
+    onClick: () => setOrderType('takeaway')
+  }, /*#__PURE__*/React.createElement("em", null, "\uD83D\uDECD\uFE0F"), /*#__PURE__*/React.createElement("span", null, "Takeaway"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 11,
+      opacity: .7
+    }
+  }, "Pack to go")))), error && /*#__PURE__*/React.createElement("p", {
+    style: {
+      color: 'var(--red)',
+      fontSize: 13,
+      textAlign: 'center'
+    }
+  }, error), /*#__PURE__*/React.createElement("button", {
+    className: "place-btn",
+    onClick: onPlace,
+    disabled: loading
+  }, loading ? 'Placing Order…' : `Place Order · ₹${cartTotal}`), /*#__PURE__*/React.createElement("p", {
+    className: "counter-note"
+  }, "Pay at the counter when your order is ready.")), /*#__PURE__*/React.createElement(BrandFooter, null));
 }
-
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.createElement(App, null));
 </script>
 </body>
 </html>

@@ -4,9 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QueueBite Admin — EasyServe</title>
-<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -145,59 +144,87 @@ a{color:var(--cyan);text-decoration:none}
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel">
-const {useState, useEffect, useRef} = React;
+<script>
+const {
+  useState,
+  useEffect,
+  useRef
+} = React;
 const API = 'https://queuebite.pythonanywhere.com';
-
-const authFetch = (path, opts={}, token=null) => {
-  const headers = {'Content-Type': 'application/json'};
+const authFetch = (path, opts = {}, token = null) => {
+  const headers = {
+    'Content-Type': 'application/json'
+  };
   if (token) headers['Authorization'] = `Bearer ${token}`;
-  return fetch(API+path, {
+  return fetch(API + path, {
     headers,
     ...opts,
-    body: opts.body ? JSON.stringify(opts.body) : undefined,
+    body: opts.body ? JSON.stringify(opts.body) : undefined
   }).then(r => r.json());
 };
-
-const uploadFetch = (path, formData, token) =>
-  fetch(API+path, {method:'POST', headers:{'Authorization':`Bearer ${token}`}, body: formData}).then(r=>r.json());
-
-function EsIcon({size=28}) {
-  return (
-    <div style={{width:size,height:size,background:'#00D4E0',borderRadius:size*0.25,display:'flex',alignItems:'center',justifyContent:'center',fontSize:size*0.38,fontWeight:700,color:'#000',flexShrink:0,fontFamily:'sans-serif'}}>
-      Es
-    </div>
-  );
+const uploadFetch = (path, formData, token) => fetch(API + path, {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${token}`
+  },
+  body: formData
+}).then(r => r.json());
+function EsIcon({
+  size = 28
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: size,
+      height: size,
+      background: '#00D4E0',
+      borderRadius: size * 0.25,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: size * 0.38,
+      fontWeight: 700,
+      color: '#000',
+      flexShrink: 0,
+      fontFamily: 'sans-serif'
+    }
+  }, "Es");
 }
 
 // ─── App ──────────────────────────────────────────────
 function App() {
-  const [view, setView]           = useState('loading');
-  const [token, setToken]         = useState(sessionStorage.getItem('adminToken'));
+  const [view, setView] = useState('loading');
+  const [token, setToken] = useState(sessionStorage.getItem('adminToken'));
   const [restaurants, setRestaurants] = useState([]);
-  const [selected, setSelected]   = useState(null);
+  const [selected, setSelected] = useState(null);
   const [frontendUrl, setFrontendUrl] = useState('');
-
   useEffect(() => {
     authFetch('/admin/status').then(d => {
-      if (!d.setup) { setView('setup'); return; }
-      if (!token)   { setView('login'); return; }
+      if (!d.setup) {
+        setView('setup');
+        return;
+      }
+      if (!token) {
+        setView('login');
+        return;
+      }
       authFetch('/admin/config', {}, token).then(cfg => {
-        if (cfg.error) { sessionStorage.removeItem('adminToken'); setView('login'); return; }
+        if (cfg.error) {
+          sessionStorage.removeItem('adminToken');
+          setView('login');
+          return;
+        }
         setFrontendUrl(cfg.frontendUrl || '');
         loadRestaurants(token);
         setView('dashboard');
       });
     }).catch(() => setView('login'));
   }, []);
-
-  const loadRestaurants = (tok) => {
+  const loadRestaurants = tok => {
     authFetch('/admin/restaurants', {}, tok).then(d => {
       if (Array.isArray(d)) setRestaurants(d);
     });
   };
-
-  const handleLogin = (tok) => {
+  const handleLogin = tok => {
     sessionStorage.setItem('adminToken', tok);
     setToken(tok);
     authFetch('/admin/config', {}, tok).then(cfg => {
@@ -206,255 +233,423 @@ function App() {
       setView('dashboard');
     });
   };
-
   const handleLogout = () => {
-    authFetch('/admin/logout', {method:'POST'}, token);
+    authFetch('/admin/logout', {
+      method: 'POST'
+    }, token);
     sessionStorage.removeItem('adminToken');
     setToken(null);
     setView('login');
   };
-
-  const handleSelectRestaurant = (r) => { setSelected(r); setView('restaurant'); };
-  const handleBack = () => { setSelected(null); setView('dashboard'); loadRestaurants(token); };
-
-  if (view === 'loading')    return <div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'100vh',color:'#6B7394'}}>Loading…</div>;
-  if (view === 'setup')      return <SetupScreen onDone={() => setView('login')} />;
-  if (view === 'login')      return <LoginScreen onLogin={handleLogin} />;
-  if (view === 'settings')   return <SettingsScreen token={token} frontendUrl={frontendUrl} onFrontendUrlChange={setFrontendUrl} onBack={()=>setView('dashboard')} />;
-  if (view === 'restaurant') return (
-    <RestaurantDetail
-      restaurant={selected}
-      token={token}
-      frontendUrl={frontendUrl}
-      onBack={handleBack}
-      onUpdate={r => setSelected(r)}
-    />
-  );
-
-  return (
-    <div>
-      <div className="topbar">
-        <div className="topbar-brand">
-          <EsIcon size={32}/>
-          <div>
-            <div className="topbar-title">QueueBite Admin</div>
-            <div className="topbar-sub">by EasyServe</div>
-          </div>
-        </div>
-        <div className="topbar-right">
-          <button className={`topbar-nav-btn${view==='dashboard'?' active':''}`} onClick={()=>setView('dashboard')}>Restaurants</button>
-          <button className={`topbar-nav-btn${view==='settings'?' active':''}`}  onClick={()=>setView('settings')}>Settings</button>
-          <button className="topbar-nav-btn" onClick={handleLogout}>Logout</button>
-        </div>
-      </div>
-      <div className="main">
-        <Dashboard
-          restaurants={restaurants}
-          token={token}
-          onSelect={handleSelectRestaurant}
-          onCreated={() => loadRestaurants(token)}
-        />
-      </div>
-    </div>
-  );
+  const handleSelectRestaurant = r => {
+    setSelected(r);
+    setView('restaurant');
+  };
+  const handleBack = () => {
+    setSelected(null);
+    setView('dashboard');
+    loadRestaurants(token);
+  };
+  if (view === 'loading') return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100vh',
+      color: '#6B7394'
+    }
+  }, "Loading\u2026");
+  if (view === 'setup') return /*#__PURE__*/React.createElement(SetupScreen, {
+    onDone: () => setView('login')
+  });
+  if (view === 'login') return /*#__PURE__*/React.createElement(LoginScreen, {
+    onLogin: handleLogin
+  });
+  if (view === 'settings') return /*#__PURE__*/React.createElement(SettingsScreen, {
+    token: token,
+    frontendUrl: frontendUrl,
+    onFrontendUrlChange: setFrontendUrl,
+    onBack: () => setView('dashboard')
+  });
+  if (view === 'restaurant') return /*#__PURE__*/React.createElement(RestaurantDetail, {
+    restaurant: selected,
+    token: token,
+    frontendUrl: frontendUrl,
+    onBack: handleBack,
+    onUpdate: r => setSelected(r)
+  });
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "topbar"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "topbar-brand"
+  }, /*#__PURE__*/React.createElement(EsIcon, {
+    size: 32
+  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "topbar-title"
+  }, "QueueBite Admin"), /*#__PURE__*/React.createElement("div", {
+    className: "topbar-sub"
+  }, "by EasyServe"))), /*#__PURE__*/React.createElement("div", {
+    className: "topbar-right"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: `topbar-nav-btn${view === 'dashboard' ? ' active' : ''}`,
+    onClick: () => setView('dashboard')
+  }, "Restaurants"), /*#__PURE__*/React.createElement("button", {
+    className: `topbar-nav-btn${view === 'settings' ? ' active' : ''}`,
+    onClick: () => setView('settings')
+  }, "Settings"), /*#__PURE__*/React.createElement("button", {
+    className: "topbar-nav-btn",
+    onClick: handleLogout
+  }, "Logout"))), /*#__PURE__*/React.createElement("div", {
+    className: "main"
+  }, /*#__PURE__*/React.createElement(Dashboard, {
+    restaurants: restaurants,
+    token: token,
+    onSelect: handleSelectRestaurant,
+    onCreated: () => loadRestaurants(token)
+  })));
 }
 
 // ─── Setup ────────────────────────────────────────────
-function SetupScreen({onDone}) {
-  const [password, setPassword]     = useState('');
-  const [confirm, setConfirm]       = useState('');
+function SetupScreen({
+  onDone
+}) {
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [frontendUrl, setFrontendUrl] = useState('');
-  const [error, setError]           = useState('');
-  const [loading, setLoading]       = useState(false);
-
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const submit = async () => {
-    if (password !== confirm) { setError('Passwords do not match'); return; }
-    if (password.length < 6)  { setError('Password must be at least 6 characters'); return; }
+    if (password !== confirm) {
+      setError('Passwords do not match');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
     setLoading(true);
-    const res = await authFetch('/admin/setup', {method:'POST', body:{password, frontendUrl}});
-    if (res.ok) onDone();
-    else setError(res.error || 'Setup failed');
+    const res = await authFetch('/admin/setup', {
+      method: 'POST',
+      body: {
+        password,
+        frontendUrl
+      }
+    });
+    if (res.ok) onDone();else setError(res.error || 'Setup failed');
     setLoading(false);
   };
-
-  return (
-    <div className="auth-wrap">
-      <div className="auth-card">
-        <div className="auth-logo">
-          <EsIcon size={44}/>
-          <div><div className="auth-logo-text">Queue<span>Bite</span></div><div style={{fontSize:12,color:'var(--muted)'}}>by EasyServe</div></div>
-        </div>
-        <h2 className="auth-title">First-time Setup</h2>
-        <p className="auth-sub">Set your admin password and configure the platform.</p>
-        {error && <div className="error-msg">{error}</div>}
-        <label className="field-label">Admin Password</label>
-        <input className="field" type="password" placeholder="Min. 6 characters" value={password} onChange={e=>setPassword(e.target.value)}/>
-        <label className="field-label">Confirm Password</label>
-        <input className="field" type="password" placeholder="Repeat password" value={confirm} onChange={e=>setConfirm(e.target.value)}/>
-        <label className="field-label">Frontend URL (for QR codes)</label>
-        <input className="field" placeholder="https://yourusername.github.io/queuebite" value={frontendUrl} onChange={e=>setFrontendUrl(e.target.value)}/>
-        <p style={{fontSize:12,color:'var(--muted)',marginBottom:16,marginTop:-8}}>The base URL where customer.html and vendor.html are hosted.</p>
-        <button className="btn-primary" onClick={submit} disabled={loading||!password||!confirm}>
-          {loading ? 'Setting up…' : 'Complete Setup'}
-        </button>
-      </div>
-    </div>
-  );
+  return /*#__PURE__*/React.createElement("div", {
+    className: "auth-wrap"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "auth-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "auth-logo"
+  }, /*#__PURE__*/React.createElement(EsIcon, {
+    size: 44
+  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "auth-logo-text"
+  }, "Queue", /*#__PURE__*/React.createElement("span", null, "Bite")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: 'var(--muted)'
+    }
+  }, "by EasyServe"))), /*#__PURE__*/React.createElement("h2", {
+    className: "auth-title"
+  }, "First-time Setup"), /*#__PURE__*/React.createElement("p", {
+    className: "auth-sub"
+  }, "Set your admin password and configure the platform."), error && /*#__PURE__*/React.createElement("div", {
+    className: "error-msg"
+  }, error), /*#__PURE__*/React.createElement("label", {
+    className: "field-label"
+  }, "Admin Password"), /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    type: "password",
+    placeholder: "Min. 6 characters",
+    value: password,
+    onChange: e => setPassword(e.target.value)
+  }), /*#__PURE__*/React.createElement("label", {
+    className: "field-label"
+  }, "Confirm Password"), /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    type: "password",
+    placeholder: "Repeat password",
+    value: confirm,
+    onChange: e => setConfirm(e.target.value)
+  }), /*#__PURE__*/React.createElement("label", {
+    className: "field-label"
+  }, "Frontend URL (for QR codes)"), /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    placeholder: "https://yourusername.github.io/queuebite",
+    value: frontendUrl,
+    onChange: e => setFrontendUrl(e.target.value)
+  }), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: 'var(--muted)',
+      marginBottom: 16,
+      marginTop: -8
+    }
+  }, "The base URL where customer.html and vendor.html are hosted."), /*#__PURE__*/React.createElement("button", {
+    className: "btn-primary",
+    onClick: submit,
+    disabled: loading || !password || !confirm
+  }, loading ? 'Setting up…' : 'Complete Setup')));
 }
 
 // ─── Login ────────────────────────────────────────────
-function LoginScreen({onLogin}) {
+function LoginScreen({
+  onLogin
+}) {
   const [password, setPassword] = useState('');
-  const [error, setError]       = useState('');
-  const [loading, setLoading]   = useState(false);
-
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const submit = async () => {
-    setLoading(true); setError('');
-    const res = await authFetch('/admin/login', {method:'POST', body:{password}});
-    if (res.token) onLogin(res.token);
-    else { setError(res.error || 'Login failed'); setLoading(false); }
+    setLoading(true);
+    setError('');
+    const res = await authFetch('/admin/login', {
+      method: 'POST',
+      body: {
+        password
+      }
+    });
+    if (res.token) onLogin(res.token);else {
+      setError(res.error || 'Login failed');
+      setLoading(false);
+    }
   };
-
-  return (
-    <div className="auth-wrap">
-      <div className="auth-card">
-        <div className="auth-logo">
-          <EsIcon size={44}/>
-          <div><div className="auth-logo-text">Queue<span>Bite</span></div><div style={{fontSize:12,color:'var(--muted)'}}>Admin Panel · EasyServe</div></div>
-        </div>
-        <h2 className="auth-title">Admin Login</h2>
-        <p className="auth-sub">Enter your admin password to continue.</p>
-        {error && <div className="error-msg">{error}</div>}
-        <label className="field-label">Password</label>
-        <input className="field" type="password" placeholder="Admin password"
-          value={password} onChange={e=>setPassword(e.target.value)}
-          onKeyDown={e=>e.key==='Enter'&&!loading&&submit()} autoFocus />
-        <button className="btn-primary" onClick={submit} disabled={loading||!password}>
-          {loading ? 'Signing in…' : 'Sign In'}
-        </button>
-      </div>
-    </div>
-  );
+  return /*#__PURE__*/React.createElement("div", {
+    className: "auth-wrap"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "auth-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "auth-logo"
+  }, /*#__PURE__*/React.createElement(EsIcon, {
+    size: 44
+  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "auth-logo-text"
+  }, "Queue", /*#__PURE__*/React.createElement("span", null, "Bite")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: 'var(--muted)'
+    }
+  }, "Admin Panel \xB7 EasyServe"))), /*#__PURE__*/React.createElement("h2", {
+    className: "auth-title"
+  }, "Admin Login"), /*#__PURE__*/React.createElement("p", {
+    className: "auth-sub"
+  }, "Enter your admin password to continue."), error && /*#__PURE__*/React.createElement("div", {
+    className: "error-msg"
+  }, error), /*#__PURE__*/React.createElement("label", {
+    className: "field-label"
+  }, "Password"), /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    type: "password",
+    placeholder: "Admin password",
+    value: password,
+    onChange: e => setPassword(e.target.value),
+    onKeyDown: e => e.key === 'Enter' && !loading && submit(),
+    autoFocus: true
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn-primary",
+    onClick: submit,
+    disabled: loading || !password
+  }, loading ? 'Signing in…' : 'Sign In')));
 }
 
 // ─── Dashboard ────────────────────────────────────────
-function Dashboard({restaurants, token, onSelect, onCreated}) {
+function Dashboard({
+  restaurants,
+  token,
+  onSelect,
+  onCreated
+}) {
   const [showCreate, setShowCreate] = useState(false);
-  const [newName, setNewName]       = useState('');
-  const [creating, setCreating]     = useState(false);
-  const [error, setError]           = useState('');
-
+  const [newName, setNewName] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [error, setError] = useState('');
   const handleCreate = async () => {
     if (!newName.trim()) return;
     setCreating(true);
-    const res = await authFetch('/admin/restaurants', {method:'POST', body:{name:newName.trim()}}, token);
-    if (res.id) { onCreated(); setShowCreate(false); setNewName(''); }
-    else setError(res.error || 'Failed to create');
+    const res = await authFetch('/admin/restaurants', {
+      method: 'POST',
+      body: {
+        name: newName.trim()
+      }
+    }, token);
+    if (res.id) {
+      onCreated();
+      setShowCreate(false);
+      setNewName('');
+    } else setError(res.error || 'Failed to create');
     setCreating(false);
   };
-
-  return (
-    <>
-      <div className="page-header">
-        <div>
-          <div className="page-title">Restaurants</div>
-          <div className="page-sub">{restaurants.length} restaurant{restaurants.length!==1?'s':''} on the platform</div>
-        </div>
-        <button className="btn-create" onClick={()=>setShowCreate(true)}>+ New Restaurant</button>
-      </div>
-
-      {showCreate && (
-        <div className="section-card" style={{marginBottom:24}}>
-          <div className="section-title">Create New Restaurant</div>
-          {error && <div className="error-msg">{error}</div>}
-          <div className="inline-form">
-            <input className="field" placeholder="Restaurant name" value={newName} onChange={e=>setNewName(e.target.value)} autoFocus onKeyDown={e=>e.key==='Enter'&&handleCreate()}/>
-            <button className="btn-sm btn-cyan" onClick={handleCreate} disabled={creating||!newName.trim()}>{creating?'Creating…':'Create'}</button>
-            <button className="btn-sm btn-outline" onClick={()=>{setShowCreate(false);setNewName('');setError('');}}>Cancel</button>
-          </div>
-          <p style={{fontSize:12,color:'var(--muted)',marginTop:10}}>A unique ID will be auto-generated. Default menu will be assigned.</p>
-        </div>
-      )}
-
-      {restaurants.length === 0
-        ? <div className="empty-state"><div className="empty-icon">🏪</div><p>No restaurants yet.<br/>Create one to get started.</p></div>
-        : <div className="rest-grid">
-            {restaurants.map(r => (
-              <div key={r.id} className="rest-card" onClick={()=>onSelect(r)}>
-                <div className="rest-card-top">
-                  <div className="rest-logo">
-                    {r.logoUrl ? <img src={`${API}${r.logoUrl}`} alt="logo"/> : '🍽️'}
-                  </div>
-                  <div style={{flex:1}}>
-                    <div className="rest-name">{r.name}</div>
-                    <div className="rest-id">{r.id}</div>
-                  </div>
-                </div>
-                <div className="rest-badges">
-                  <span className={`badge ${r.active?'badge-active':'badge-inactive'}`}>{r.active?'Active':'Inactive'}</span>
-                  <span className={`badge ${r.acceptingOrders?'badge-open':'badge-closed'}`}>{r.acceptingOrders?'Taking Orders':'Paused'}</span>
-                </div>
-                <div className="rest-meta">Created {new Date(r.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</div>
-              </div>
-            ))}
-          </div>
-      }
-    </>
-  );
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "page-header"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "page-title"
+  }, "Restaurants"), /*#__PURE__*/React.createElement("div", {
+    className: "page-sub"
+  }, restaurants.length, " restaurant", restaurants.length !== 1 ? 's' : '', " on the platform")), /*#__PURE__*/React.createElement("button", {
+    className: "btn-create",
+    onClick: () => setShowCreate(true)
+  }, "+ New Restaurant")), showCreate && /*#__PURE__*/React.createElement("div", {
+    className: "section-card",
+    style: {
+      marginBottom: 24
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-title"
+  }, "Create New Restaurant"), error && /*#__PURE__*/React.createElement("div", {
+    className: "error-msg"
+  }, error), /*#__PURE__*/React.createElement("div", {
+    className: "inline-form"
+  }, /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    placeholder: "Restaurant name",
+    value: newName,
+    onChange: e => setNewName(e.target.value),
+    autoFocus: true,
+    onKeyDown: e => e.key === 'Enter' && handleCreate()
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn-sm btn-cyan",
+    onClick: handleCreate,
+    disabled: creating || !newName.trim()
+  }, creating ? 'Creating…' : 'Create'), /*#__PURE__*/React.createElement("button", {
+    className: "btn-sm btn-outline",
+    onClick: () => {
+      setShowCreate(false);
+      setNewName('');
+      setError('');
+    }
+  }, "Cancel")), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 12,
+      color: 'var(--muted)',
+      marginTop: 10
+    }
+  }, "A unique ID will be auto-generated. Default menu will be assigned.")), restaurants.length === 0 ? /*#__PURE__*/React.createElement("div", {
+    className: "empty-state"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "empty-icon"
+  }, "\uD83C\uDFEA"), /*#__PURE__*/React.createElement("p", null, "No restaurants yet.", /*#__PURE__*/React.createElement("br", null), "Create one to get started.")) : /*#__PURE__*/React.createElement("div", {
+    className: "rest-grid"
+  }, restaurants.map(r => /*#__PURE__*/React.createElement("div", {
+    key: r.id,
+    className: "rest-card",
+    onClick: () => onSelect(r)
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "rest-card-top"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "rest-logo"
+  }, r.logoUrl ? /*#__PURE__*/React.createElement("img", {
+    src: `${API}${r.logoUrl}`,
+    alt: "logo"
+  }) : '🍽️'), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "rest-name"
+  }, r.name), /*#__PURE__*/React.createElement("div", {
+    className: "rest-id"
+  }, r.id))), /*#__PURE__*/React.createElement("div", {
+    className: "rest-badges"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: `badge ${r.active ? 'badge-active' : 'badge-inactive'}`
+  }, r.active ? 'Active' : 'Inactive'), /*#__PURE__*/React.createElement("span", {
+    className: `badge ${r.acceptingOrders ? 'badge-open' : 'badge-closed'}`
+  }, r.acceptingOrders ? 'Taking Orders' : 'Paused')), /*#__PURE__*/React.createElement("div", {
+    className: "rest-meta"
+  }, "Created ", new Date(r.createdAt).toLocaleDateString('en-IN', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  }))))));
 }
 
 // ─── Restaurant Detail ────────────────────────────────
-function RestaurantDetail({restaurant, token, frontendUrl, onBack, onUpdate}) {
-  const [info, setInfo]         = useState(restaurant);
-  const [staff, setStaff]       = useState([]);
+function RestaurantDetail({
+  restaurant,
+  token,
+  frontendUrl,
+  onBack,
+  onUpdate
+}) {
+  const [info, setInfo] = useState(restaurant);
+  const [staff, setStaff] = useState([]);
   const [editName, setEditName] = useState(restaurant.name);
-  const [msg, setMsg]           = useState('');
-  const [msgType, setMsgType]   = useState('');
+  const [msg, setMsg] = useState('');
+  const [msgType, setMsgType] = useState('');
   const qrRef = useRef(null);
   const qrInstance = useRef(null);
-
   const customerUrl = `${frontendUrl}/customer.html?r=${info.id}`;
-  const vendorUrl   = `${frontendUrl}/vendor.html?r=${info.id}`;
-
-  useEffect(() => { loadStaff(); }, []);
+  const vendorUrl = `${frontendUrl}/vendor.html?r=${info.id}`;
+  useEffect(() => {
+    loadStaff();
+  }, []);
   useEffect(() => {
     if (qrRef.current && frontendUrl) {
       qrRef.current.innerHTML = '';
-      qrInstance.current = new QRCode(qrRef.current, {text: customerUrl, width:200, height:200, colorDark:'#000000', colorLight:'#FFFFFF'});
+      qrInstance.current = new QRCode(qrRef.current, {
+        text: customerUrl,
+        width: 200,
+        height: 200,
+        colorDark: '#000000',
+        colorLight: '#FFFFFF'
+      });
     }
   }, [frontendUrl, info.id]);
-
   const loadStaff = () => {
     authFetch(`/admin/restaurants/${info.id}/staff`, {}, token).then(d => {
       if (Array.isArray(d)) setStaff(d);
     });
   };
-
-  const flash = (text, type='success') => { setMsg(text); setMsgType(type); setTimeout(()=>setMsg(''), 3000); };
-
+  const flash = (text, type = 'success') => {
+    setMsg(text);
+    setMsgType(type);
+    setTimeout(() => setMsg(''), 3000);
+  };
   const saveName = async () => {
-    const res = await authFetch(`/admin/restaurants/${info.id}`, {method:'PATCH', body:{name:editName.trim()}}, token);
-    if (res.id) { setInfo(res); onUpdate(res); flash('Name updated'); }
-    else flash(res.error || 'Failed', 'error');
+    const res = await authFetch(`/admin/restaurants/${info.id}`, {
+      method: 'PATCH',
+      body: {
+        name: editName.trim()
+      }
+    }, token);
+    if (res.id) {
+      setInfo(res);
+      onUpdate(res);
+      flash('Name updated');
+    } else flash(res.error || 'Failed', 'error');
   };
-
   const toggleActive = async () => {
-    const res = await authFetch(`/admin/restaurants/${info.id}`, {method:'PATCH', body:{active:!info.active}}, token);
-    if (res.id) { setInfo(res); onUpdate(res); flash(`Restaurant ${res.active?'activated':'deactivated'}`); }
+    const res = await authFetch(`/admin/restaurants/${info.id}`, {
+      method: 'PATCH',
+      body: {
+        active: !info.active
+      }
+    }, token);
+    if (res.id) {
+      setInfo(res);
+      onUpdate(res);
+      flash(`Restaurant ${res.active ? 'activated' : 'deactivated'}`);
+    }
   };
-
-  const uploadLogo = async (e) => {
+  const uploadLogo = async e => {
     const file = e.target.files[0];
     if (!file) return;
     const fd = new FormData();
     fd.append('logo', file);
     const res = await uploadFetch(`/admin/restaurants/${info.id}/logo`, fd, token);
     if (res.ok) {
-      const updated = {...info, logoUrl: res.logoUrl + '?t=' + Date.now()};
-      setInfo(updated); onUpdate(updated); flash('Logo uploaded');
+      const updated = {
+        ...info,
+        logoUrl: res.logoUrl + '?t=' + Date.now()
+      };
+      setInfo(updated);
+      onUpdate(updated);
+      flash('Logo uploaded');
     } else flash(res.error || 'Upload failed', 'error');
   };
-
   const downloadQR = () => {
     const canvas = qrRef.current?.querySelector('canvas');
     if (!canvas) return;
@@ -463,230 +658,477 @@ function RestaurantDetail({restaurant, token, frontendUrl, onBack, onUpdate}) {
     a.download = `${info.id}-qr.png`;
     a.click();
   };
-
-  return (
-    <>
-      <button className="back-btn" onClick={onBack}>← Back to Restaurants</button>
-
-      {msg && <div className={msg && msgType==='error' ? 'error-msg' : 'success-msg'} style={{marginBottom:16}}>{msg}</div>}
-
-      <div className="detail-header">
-        <div className="detail-logo">
-          {info.logoUrl ? <img src={`${API}${info.logoUrl}`} alt="logo" key={info.logoUrl}/> : '🍽️'}
-        </div>
-        <div className="detail-info">
-          <div className="detail-name">{info.name}</div>
-          <div className="detail-id">ID: {info.id}</div>
-          <div style={{display:'flex',gap:8,flexWrap:'wrap'}}>
-            <span className={`badge ${info.active?'badge-active':'badge-inactive'}`}>{info.active?'Active':'Inactive'}</span>
-            <span className={`badge ${info.acceptingOrders?'badge-open':'badge-closed'}`}>{info.acceptingOrders?'Taking Orders':'Paused'}</span>
-          </div>
-        </div>
-      </div>
-
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:20}}>
-
-        {/* Left column */}
-        <div>
-          {/* Edit name */}
-          <div className="section-card">
-            <div className="section-title">Restaurant Name</div>
-            <div className="inline-form">
-              <input className="field" value={editName} onChange={e=>setEditName(e.target.value)}/>
-              <button className="btn-sm btn-cyan" onClick={saveName} disabled={!editName.trim()}>Save</button>
-            </div>
-          </div>
-
-          {/* Logo */}
-          <div className="section-card">
-            <div className="section-title">Logo</div>
-            <p style={{fontSize:13,color:'var(--muted)',marginBottom:14}}>Shown to customers and vendors. JPG, PNG or WebP.</p>
-            <label style={{display:'inline-block',padding:'9px 16px',background:'var(--cyan)',color:'#000',borderRadius:8,fontSize:13,fontWeight:700,cursor:'pointer'}}>
-              Upload Logo
-              <input type="file" accept="image/jpeg,image/png,image/webp" style={{display:'none'}} onChange={uploadLogo}/>
-            </label>
-          </div>
-
-          {/* Active toggle */}
-          <div className="section-card">
-            <div className="section-title">Restaurant Status</div>
-            <div className="toggle-row">
-              <div className="toggle-info">
-                <div className="toggle-label">{info.active ? 'Active' : 'Deactivated'}</div>
-                <div className="toggle-sub">{info.active ? 'Customers can access this restaurant.' : 'Customers see a "closed" screen.'}</div>
-              </div>
-              <label className="toggle">
-                <input type="checkbox" checked={info.active} onChange={toggleActive}/>
-                <span className="slider"></span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        {/* Right column */}
-        <div>
-          {/* QR Code */}
-          <div className="section-card">
-            <div className="section-title">Customer QR Code</div>
-            {frontendUrl
-              ? <>
-                  <div className="qr-wrap">
-                    <div ref={qrRef} style={{background:'#fff',padding:12,borderRadius:8}}/>
-                    <div className="qr-url">{customerUrl}</div>
-                  </div>
-                  <div style={{display:'flex',gap:8,marginTop:12,flexWrap:'wrap'}}>
-                    <button className="btn-sm btn-cyan" onClick={downloadQR}>Download PNG</button>
-                    <button className="btn-sm btn-outline" onClick={()=>navigator.clipboard.writeText(customerUrl)}>Copy Customer URL</button>
-                    <button className="btn-sm btn-outline" onClick={()=>navigator.clipboard.writeText(vendorUrl)}>Copy Vendor URL</button>
-                  </div>
-                </>
-              : <p style={{fontSize:13,color:'var(--muted)'}}>Set your Frontend URL in Settings to generate QR codes.</p>
-            }
-          </div>
-        </div>
-      </div>
-
-      {/* Staff */}
-      <div className="section-card" style={{marginTop:0}}>
-        <div className="section-title">Staff Accounts</div>
-        <AddStaffForm restaurantId={info.id} token={token} onAdded={loadStaff}/>
-        <div className="divider"/>
-        {staff.length === 0
-          ? <p style={{fontSize:13,color:'var(--muted)',textAlign:'center',padding:'16px 0'}}>No staff yet.</p>
-          : staff.map(m => <StaffRow key={m.username} member={m} restaurantId={info.id} token={token} onChanged={loadStaff}/>)
-        }
-      </div>
-    </>
-  );
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+    className: "back-btn",
+    onClick: onBack
+  }, "\u2190 Back to Restaurants"), msg && /*#__PURE__*/React.createElement("div", {
+    className: msg && msgType === 'error' ? 'error-msg' : 'success-msg',
+    style: {
+      marginBottom: 16
+    }
+  }, msg), /*#__PURE__*/React.createElement("div", {
+    className: "detail-header"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "detail-logo"
+  }, info.logoUrl ? /*#__PURE__*/React.createElement("img", {
+    src: `${API}${info.logoUrl}`,
+    alt: "logo",
+    key: info.logoUrl
+  }) : '🍽️'), /*#__PURE__*/React.createElement("div", {
+    className: "detail-info"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "detail-name"
+  }, info.name), /*#__PURE__*/React.createElement("div", {
+    className: "detail-id"
+  }, "ID: ", info.id), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 8,
+      flexWrap: 'wrap'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: `badge ${info.active ? 'badge-active' : 'badge-inactive'}`
+  }, info.active ? 'Active' : 'Inactive'), /*#__PURE__*/React.createElement("span", {
+    className: `badge ${info.acceptingOrders ? 'badge-open' : 'badge-closed'}`
+  }, info.acceptingOrders ? 'Taking Orders' : 'Paused')))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gap: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "section-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-title"
+  }, "Restaurant Name"), /*#__PURE__*/React.createElement("div", {
+    className: "inline-form"
+  }, /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    value: editName,
+    onChange: e => setEditName(e.target.value)
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn-sm btn-cyan",
+    onClick: saveName,
+    disabled: !editName.trim()
+  }, "Save"))), /*#__PURE__*/React.createElement("div", {
+    className: "section-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-title"
+  }, "Logo"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 13,
+      color: 'var(--muted)',
+      marginBottom: 14
+    }
+  }, "Shown to customers and vendors. JPG, PNG or WebP."), /*#__PURE__*/React.createElement("label", {
+    style: {
+      display: 'inline-block',
+      padding: '9px 16px',
+      background: 'var(--cyan)',
+      color: '#000',
+      borderRadius: 8,
+      fontSize: 13,
+      fontWeight: 700,
+      cursor: 'pointer'
+    }
+  }, "Upload Logo", /*#__PURE__*/React.createElement("input", {
+    type: "file",
+    accept: "image/jpeg,image/png,image/webp",
+    style: {
+      display: 'none'
+    },
+    onChange: uploadLogo
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "section-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-title"
+  }, "Restaurant Status"), /*#__PURE__*/React.createElement("div", {
+    className: "toggle-row"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "toggle-info"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "toggle-label"
+  }, info.active ? 'Active' : 'Deactivated'), /*#__PURE__*/React.createElement("div", {
+    className: "toggle-sub"
+  }, info.active ? 'Customers can access this restaurant.' : 'Customers see a "closed" screen.')), /*#__PURE__*/React.createElement("label", {
+    className: "toggle"
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: info.active,
+    onChange: toggleActive
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "slider"
+  }))))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "section-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-title"
+  }, "Customer QR Code"), frontendUrl ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "qr-wrap"
+  }, /*#__PURE__*/React.createElement("div", {
+    ref: qrRef,
+    style: {
+      background: '#fff',
+      padding: 12,
+      borderRadius: 8
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "qr-url"
+  }, customerUrl)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 8,
+      marginTop: 12,
+      flexWrap: 'wrap'
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn-sm btn-cyan",
+    onClick: downloadQR
+  }, "Download PNG"), /*#__PURE__*/React.createElement("button", {
+    className: "btn-sm btn-outline",
+    onClick: () => navigator.clipboard.writeText(customerUrl)
+  }, "Copy Customer URL"), /*#__PURE__*/React.createElement("button", {
+    className: "btn-sm btn-outline",
+    onClick: () => navigator.clipboard.writeText(vendorUrl)
+  }, "Copy Vendor URL"))) : /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 13,
+      color: 'var(--muted)'
+    }
+  }, "Set your Frontend URL in Settings to generate QR codes.")))), /*#__PURE__*/React.createElement("div", {
+    className: "section-card",
+    style: {
+      marginTop: 0
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-title"
+  }, "Staff Accounts"), /*#__PURE__*/React.createElement(AddStaffForm, {
+    restaurantId: info.id,
+    token: token,
+    onAdded: loadStaff
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "divider"
+  }), staff.length === 0 ? /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 13,
+      color: 'var(--muted)',
+      textAlign: 'center',
+      padding: '16px 0'
+    }
+  }, "No staff yet.") : staff.map(m => /*#__PURE__*/React.createElement(StaffRow, {
+    key: m.username,
+    member: m,
+    restaurantId: info.id,
+    token: token,
+    onChanged: loadStaff
+  }))));
 }
-
-function AddStaffForm({restaurantId, token, onAdded}) {
-  const [form, setForm] = useState({username:'', name:'', password:'', role:'staff'});
+function AddStaffForm({
+  restaurantId,
+  token,
+  onAdded
+}) {
+  const [form, setForm] = useState({
+    username: '',
+    name: '',
+    password: '',
+    role: 'staff'
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
   const submit = async () => {
-    setLoading(true); setError('');
-    const res = await authFetch(`/admin/restaurants/${restaurantId}/staff`, {method:'POST', body:form}, token);
-    if (res.username) { onAdded(); setForm({username:'', name:'', password:'', role:'staff'}); }
-    else setError(res.error || 'Failed');
+    setLoading(true);
+    setError('');
+    const res = await authFetch(`/admin/restaurants/${restaurantId}/staff`, {
+      method: 'POST',
+      body: form
+    }, token);
+    if (res.username) {
+      onAdded();
+      setForm({
+        username: '',
+        name: '',
+        password: '',
+        role: 'staff'
+      });
+    } else setError(res.error || 'Failed');
     setLoading(false);
   };
-
-  return (
-    <div style={{marginBottom:16}}>
-      <div style={{fontSize:12,fontWeight:600,color:'var(--muted)',marginBottom:10,textTransform:'uppercase',letterSpacing:'.05em'}}>Add Staff Member</div>
-      {error && <div className="error-msg">{error}</div>}
-      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}}>
-        <input className="field" style={{marginBottom:0}} placeholder="Username" value={form.username} onChange={e=>setForm({...form,username:e.target.value})}/>
-        <input className="field" style={{marginBottom:0}} placeholder="Display name" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/>
-        <input className="field" style={{marginBottom:0}} type="password" placeholder="Password" value={form.password} onChange={e=>setForm({...form,password:e.target.value})}/>
-        <select className="select-field" style={{marginBottom:0}} value={form.role} onChange={e=>setForm({...form,role:e.target.value})}>
-          <option value="staff">Staff — Orders only</option>
-          <option value="manager">Manager — Full access</option>
-        </select>
-      </div>
-      <button className="btn-sm btn-cyan" onClick={submit} disabled={loading||!form.username||!form.password}>
-        {loading ? 'Adding…' : 'Add Staff Member'}
-      </button>
-    </div>
-  );
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      fontWeight: 600,
+      color: 'var(--muted)',
+      marginBottom: 10,
+      textTransform: 'uppercase',
+      letterSpacing: '.05em'
+    }
+  }, "Add Staff Member"), error && /*#__PURE__*/React.createElement("div", {
+    className: "error-msg"
+  }, error), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gap: 10,
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    style: {
+      marginBottom: 0
+    },
+    placeholder: "Username",
+    value: form.username,
+    onChange: e => setForm({
+      ...form,
+      username: e.target.value
+    })
+  }), /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    style: {
+      marginBottom: 0
+    },
+    placeholder: "Display name",
+    value: form.name,
+    onChange: e => setForm({
+      ...form,
+      name: e.target.value
+    })
+  }), /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    style: {
+      marginBottom: 0
+    },
+    type: "password",
+    placeholder: "Password",
+    value: form.password,
+    onChange: e => setForm({
+      ...form,
+      password: e.target.value
+    })
+  }), /*#__PURE__*/React.createElement("select", {
+    className: "select-field",
+    style: {
+      marginBottom: 0
+    },
+    value: form.role,
+    onChange: e => setForm({
+      ...form,
+      role: e.target.value
+    })
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "staff"
+  }, "Staff \u2014 Orders only"), /*#__PURE__*/React.createElement("option", {
+    value: "manager"
+  }, "Manager \u2014 Full access"))), /*#__PURE__*/React.createElement("button", {
+    className: "btn-sm btn-cyan",
+    onClick: submit,
+    disabled: loading || !form.username || !form.password
+  }, loading ? 'Adding…' : 'Add Staff Member'));
 }
-
-function StaffRow({member, restaurantId, token, onChanged}) {
+function StaffRow({
+  member,
+  restaurantId,
+  token,
+  onChanged
+}) {
   const [resetting, setResetting] = useState(false);
-  const [newPwd, setNewPwd]       = useState('');
+  const [newPwd, setNewPwd] = useState('');
   const [showReset, setShowReset] = useState(false);
-
   const remove = async () => {
     if (!window.confirm(`Remove ${member.name}?`)) return;
-    await authFetch(`/admin/restaurants/${restaurantId}/staff/${member.username}`, {method:'DELETE'}, token);
+    await authFetch(`/admin/restaurants/${restaurantId}/staff/${member.username}`, {
+      method: 'DELETE'
+    }, token);
     onChanged();
   };
-
   const resetPwd = async () => {
     if (!newPwd.trim() || newPwd.length < 4) return;
     setResetting(true);
-    await authFetch(`/admin/restaurants/${restaurantId}/staff/${member.username}/password`, {method:'PATCH', body:{password:newPwd}}, token);
-    setNewPwd(''); setShowReset(false); setResetting(false);
+    await authFetch(`/admin/restaurants/${restaurantId}/staff/${member.username}/password`, {
+      method: 'PATCH',
+      body: {
+        password: newPwd
+      }
+    }, token);
+    setNewPwd('');
+    setShowReset(false);
+    setResetting(false);
   };
-
-  return (
-    <div>
-      <div className="staff-row">
-        <div style={{flex:1}}>
-          <div style={{display:'flex',alignItems:'center',gap:8}}>
-            <span className="staff-name">{member.name}</span>
-            <span className={`role-badge ${member.role==='manager'?'role-manager':'role-staff'}`}>{member.role}</span>
-          </div>
-          <div className="staff-meta">@{member.username}</div>
-        </div>
-        <button className="btn-sm btn-outline" style={{marginRight:6}} onClick={()=>setShowReset(!showReset)}>Reset Password</button>
-        <button className="btn-sm btn-danger" onClick={remove}>Remove</button>
-      </div>
-      {showReset && (
-        <div style={{display:'flex',gap:8,padding:'8px 0 4px',borderBottom:'1px solid var(--border)'}}>
-          <input className="field" style={{marginBottom:0,flex:1}} type="password" placeholder="New password" value={newPwd} onChange={e=>setNewPwd(e.target.value)}/>
-          <button className="btn-sm btn-cyan" onClick={resetPwd} disabled={resetting||newPwd.length<4}>{resetting?'Saving…':'Save'}</button>
-          <button className="btn-sm btn-outline" onClick={()=>setShowReset(false)}>Cancel</button>
-        </div>
-      )}
-    </div>
-  );
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "staff-row"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "staff-name"
+  }, member.name), /*#__PURE__*/React.createElement("span", {
+    className: `role-badge ${member.role === 'manager' ? 'role-manager' : 'role-staff'}`
+  }, member.role)), /*#__PURE__*/React.createElement("div", {
+    className: "staff-meta"
+  }, "@", member.username)), /*#__PURE__*/React.createElement("button", {
+    className: "btn-sm btn-outline",
+    style: {
+      marginRight: 6
+    },
+    onClick: () => setShowReset(!showReset)
+  }, "Reset Password"), /*#__PURE__*/React.createElement("button", {
+    className: "btn-sm btn-danger",
+    onClick: remove
+  }, "Remove")), showReset && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 8,
+      padding: '8px 0 4px',
+      borderBottom: '1px solid var(--border)'
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    style: {
+      marginBottom: 0,
+      flex: 1
+    },
+    type: "password",
+    placeholder: "New password",
+    value: newPwd,
+    onChange: e => setNewPwd(e.target.value)
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn-sm btn-cyan",
+    onClick: resetPwd,
+    disabled: resetting || newPwd.length < 4
+  }, resetting ? 'Saving…' : 'Save'), /*#__PURE__*/React.createElement("button", {
+    className: "btn-sm btn-outline",
+    onClick: () => setShowReset(false)
+  }, "Cancel")));
 }
 
 // ─── Settings ─────────────────────────────────────────
-function SettingsScreen({token, frontendUrl, onFrontendUrlChange, onBack}) {
-  const [url, setUrl]           = useState(frontendUrl);
-  const [curPwd, setCurPwd]     = useState('');
-  const [newPwd, setNewPwd]     = useState('');
+function SettingsScreen({
+  token,
+  frontendUrl,
+  onFrontendUrlChange,
+  onBack
+}) {
+  const [url, setUrl] = useState(frontendUrl);
+  const [curPwd, setCurPwd] = useState('');
+  const [newPwd, setNewPwd] = useState('');
   const [confirmPwd, setConfirmPwd] = useState('');
-  const [msg, setMsg]           = useState('');
-  const [msgType, setMsgType]   = useState('');
-
-  const flash = (text, type='success') => { setMsg(text); setMsgType(type); setTimeout(()=>setMsg(''), 3000); };
-
+  const [msg, setMsg] = useState('');
+  const [msgType, setMsgType] = useState('');
+  const flash = (text, type = 'success') => {
+    setMsg(text);
+    setMsgType(type);
+    setTimeout(() => setMsg(''), 3000);
+  };
   const saveUrl = async () => {
-    const res = await authFetch('/admin/config', {method:'PATCH', body:{frontendUrl:url}}, token);
-    if (res.ok) { onFrontendUrlChange(url); flash('Frontend URL updated'); }
-    else flash(res.error || 'Failed', 'error');
+    const res = await authFetch('/admin/config', {
+      method: 'PATCH',
+      body: {
+        frontendUrl: url
+      }
+    }, token);
+    if (res.ok) {
+      onFrontendUrlChange(url);
+      flash('Frontend URL updated');
+    } else flash(res.error || 'Failed', 'error');
   };
-
   const changePassword = async () => {
-    if (newPwd !== confirmPwd) { flash('Passwords do not match', 'error'); return; }
-    if (newPwd.length < 6)     { flash('Password must be at least 6 characters', 'error'); return; }
-    const res = await authFetch('/admin/password', {method:'PATCH', body:{currentPassword:curPwd, newPassword:newPwd}}, token);
-    if (res.ok) { flash('Password changed'); setCurPwd(''); setNewPwd(''); setConfirmPwd(''); }
-    else flash(res.error || 'Failed', 'error');
+    if (newPwd !== confirmPwd) {
+      flash('Passwords do not match', 'error');
+      return;
+    }
+    if (newPwd.length < 6) {
+      flash('Password must be at least 6 characters', 'error');
+      return;
+    }
+    const res = await authFetch('/admin/password', {
+      method: 'PATCH',
+      body: {
+        currentPassword: curPwd,
+        newPassword: newPwd
+      }
+    }, token);
+    if (res.ok) {
+      flash('Password changed');
+      setCurPwd('');
+      setNewPwd('');
+      setConfirmPwd('');
+    } else flash(res.error || 'Failed', 'error');
   };
-
-  return (
-    <>
-      <button className="back-btn" onClick={onBack}>← Back to Restaurants</button>
-      <div className="page-header" style={{marginBottom:24}}>
-        <div><div className="page-title">Settings</div></div>
-      </div>
-      {msg && <div className={msgType==='error'?'error-msg':'success-msg'} style={{marginBottom:16}}>{msg}</div>}
-      <div className="settings-grid">
-        <div className="section-card">
-          <div className="section-title">Frontend URL</div>
-          <p style={{fontSize:13,color:'var(--muted)',marginBottom:14}}>Base URL where your HTML files are hosted. Used for QR code generation.</p>
-          <input className="field" placeholder="https://username.github.io/queuebite" value={url} onChange={e=>setUrl(e.target.value)}/>
-          <button className="btn-sm btn-cyan" onClick={saveUrl}>Save URL</button>
-        </div>
-        <div className="section-card">
-          <div className="section-title">Change Admin Password</div>
-          <input className="field" type="password" placeholder="Current password" value={curPwd} onChange={e=>setCurPwd(e.target.value)}/>
-          <input className="field" type="password" placeholder="New password" value={newPwd} onChange={e=>setNewPwd(e.target.value)}/>
-          <input className="field" type="password" placeholder="Confirm new password" value={confirmPwd} onChange={e=>setConfirmPwd(e.target.value)}/>
-          <button className="btn-sm btn-cyan" onClick={changePassword} disabled={!curPwd||!newPwd||!confirmPwd}>Change Password</button>
-        </div>
-      </div>
-    </>
-  );
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+    className: "back-btn",
+    onClick: onBack
+  }, "\u2190 Back to Restaurants"), /*#__PURE__*/React.createElement("div", {
+    className: "page-header",
+    style: {
+      marginBottom: 24
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "page-title"
+  }, "Settings"))), msg && /*#__PURE__*/React.createElement("div", {
+    className: msgType === 'error' ? 'error-msg' : 'success-msg',
+    style: {
+      marginBottom: 16
+    }
+  }, msg), /*#__PURE__*/React.createElement("div", {
+    className: "settings-grid"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-title"
+  }, "Frontend URL"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 13,
+      color: 'var(--muted)',
+      marginBottom: 14
+    }
+  }, "Base URL where your HTML files are hosted. Used for QR code generation."), /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    placeholder: "https://username.github.io/queuebite",
+    value: url,
+    onChange: e => setUrl(e.target.value)
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn-sm btn-cyan",
+    onClick: saveUrl
+  }, "Save URL")), /*#__PURE__*/React.createElement("div", {
+    className: "section-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "section-title"
+  }, "Change Admin Password"), /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    type: "password",
+    placeholder: "Current password",
+    value: curPwd,
+    onChange: e => setCurPwd(e.target.value)
+  }), /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    type: "password",
+    placeholder: "New password",
+    value: newPwd,
+    onChange: e => setNewPwd(e.target.value)
+  }), /*#__PURE__*/React.createElement("input", {
+    className: "field",
+    type: "password",
+    placeholder: "Confirm new password",
+    value: confirmPwd,
+    onChange: e => setConfirmPwd(e.target.value)
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn-sm btn-cyan",
+    onClick: changePassword,
+    disabled: !curPwd || !newPwd || !confirmPwd
+  }, "Change Password"))));
 }
-
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.createElement(App, null));
 </script>
 </body>
 </html>
